@@ -8,8 +8,7 @@ public class Player {
 
     public Player(String name) {
         this.name = name;
-        this.money = 1500; // Starting money
-        this.position = 0; // Start at GO
+        this.money = 1500; // Starting money for the player
     }
 
     public String getName() {

@@ -39,4 +39,12 @@ public abstract class Space {
     public void setColorGroup(String colorGroup) {
         this.colorGroup = colorGroup;
     }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 }

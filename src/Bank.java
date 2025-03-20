@@ -4,6 +4,8 @@ public class Bank {
     private int hotels;
     private int tokens;
     private int chestAndCardSpots;
+
+    // Initializes the bank with default resources to start the game.
     public Bank() {
         money = 0;
         houses = 32;
@@ -11,6 +13,7 @@ public class Bank {
         tokens = 16;
         chestAndCardSpots = 16;
     }
+
     public int getMoney() {
         return money;
     }
@@ -70,5 +73,14 @@ public class Bank {
     }
     public void removeChestAndCardSpots(int chestAndCardSpots) {
         this.chestAndCardSpots -= chestAndCardSpots;
+    }
+
+    /**
+     * Gives the starting money ($1500) to a player.
+     * Reduces the money in the bank accordingly.
+     */
+    public void giveStartingMoney(Player player) {
+        player.addMoney(1500);
+        this.removeMoney(1500);
     }
 }
