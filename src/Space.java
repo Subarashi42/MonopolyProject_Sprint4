@@ -11,11 +11,6 @@ public abstract class Space {
         this.type = type;
     }
 
-    @Override
-    public String toString() {
-        return position + ": " + name + " (" + type + ")";
-    }
-
     public Player getOwner() {
         return owner;
     }
@@ -28,16 +23,30 @@ public abstract class Space {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public String getColorGroup() {
+//        return colorGroup;
+//    }
+//
+//    public void setColorGroup(String colorGroup) {
+//        this.colorGroup = colorGroup;
+//    }
+
+    // method for landing on a special space (go, jail, etc.)
+    public void playerOnSpecialSpace(){
+        System.out.println("Player landed on " + );
     }
 
-    public String getColorGroup() {
-        return colorGroup;
-    }
+    // method for landing on a property
+    // method for landing on a railroad
+    // method for landing on a card space
 
-    public void setColorGroup(String colorGroup) {
-        this.colorGroup = colorGroup;
+    @Override
+    public String toString() {
+        return position + ": " + name + " (" + type + ")";
     }
 
     public int getPosition() {
