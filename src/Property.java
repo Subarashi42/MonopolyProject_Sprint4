@@ -46,7 +46,17 @@ public class Property extends Space {
     public void onLand(Player player){
         if (isOwned() && owner != player){
             player.payRent(owner, rent);
-            // TODO: Add logic for rent calculation based on houses/hotel
+            if (isOwned() && owner != player) {
+                int calculatedRent = rent;
+                if (hasHotel) {
+                    calculatedRent *= 5; // Rent increases 5x if there is a hotel
+                } else if (houses > 0) {
+                    calculatedRent *= (1 + houses); // Rent increases by a factor based on the number of houses
+                }
+                player.payRent(owner, calculatedRent);
+            } else if (!isOwned()) {
+                player.buyProperty(this);
+            }
         }
     }
 

@@ -65,6 +65,7 @@ It has a list of spaces that represent the different spaces on the board.
             System.out.println(space);
         }
     }
+    
 
     public static void main(String[] args) {
         Gameboard board = new Gameboard();
