@@ -5,49 +5,110 @@ import java.util.Map;
  * Interface to represent the state of a Monopoly game.
  * Tracks players, board, dice, cards and overall game status.
  */
-public interface GameState {
-    // Player management
-    List<Player> getPlayers();
+import java.util.*;
 
-    Player getCurrentPlayer();
+public class GameState {
+    private List<Player> players;
+    private int currentPlayerIndex;
+    private Gameboard board;
+    private Dice dice;
+    private CommunityChestCards communityChestCards;
+    private ChanceCards chanceCards;
+    private Map<Player, Boolean> isInJail;
+    private boolean gameActive;
 
-    void nextTurn();
+    public GameState(List<Player> players, Gameboard board) {
+        this.players = players;
+        this.board = board;
+        this.dice = new Dice();
+        this.communityChestCards = new CommunityChestCards();
+        this.chanceCards = new ChanceCards();
+        this.isInJail = new HashMap<>();
+        for (Player player : players) {
+            isInJail.put(player, false);
+        }
+        this.gameActive = true;
+        this.currentPlayerIndex = 0;
+        communityChestCards.cards();
+        chanceCards.cards();
+    }
 
-    // Board state
-    Gameboard getBoard();
+    public List<Player> getPlayers() {
+        return players;
+    }
 
-    Map<Integer, String> getPropertyOwnership();
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
 
-    // Dice operations
-    int rollDice();
+    public void nextTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+    }
 
-    int[] getDiceValues();
+    public Gameboard getBoard() {
+        return board;
+    }
 
-    // Card operations
-    String drawChanceCard();
+    public Map<Integer, String> getPropertyOwnership() {
+        return board.getPropertyOwnership();
+    }
 
-    String drawCommunityChestCard();
+    public int rollDice() {
+        return dice.rollDice();
+    }
 
-    // Money operations
-    void transferMoney(Player from, Player to, int amount);
+    public int[] getDiceValues() {
+        return new int[]{dice.getDie1Value(), dice.getDie2Value()};
+    }
 
-    void collectFromBank(Player player, int amount);
+    public String drawChanceCard() {
+        return chanceCards.shuffleCards();
+    }
 
-    void payToBank(Player player, int amount);
+    public String drawCommunityChestCard() {
+        return communityChestCards.shuffleCards();
+    }
 
-    // Game status
-    boolean isGameActive();
+    public void transferMoney(Player from, Player to, int amount) {
+        from.deductMoney(amount);
+        to.addMoney(amount);
+    }
 
-    boolean isPlayerInJail(Player player);
+    public void collectFromBank(Player player, int amount) {
+        player.addMoney(amount);
+    }
 
-    void sendToJail(Player player);
+    public void payToBank(Player player, int amount) {
+        player.deductMoney(amount);
+    }
 
-    void releaseFromJail(Player player);
+    public boolean isGameActive() {
+        return gameActive;
+    }
 
-    // Display methods
-    void displayGameState();
+    public boolean isPlayerInJail(Player player) {
+        return isInJail.getOrDefault(player, false);
+    }
 
-    void displayPlayerStatus(Player player);
+    public void sendToJail(Player player) {
+        isInJail.put(player, true);
+    }
+
+    public void releaseFromJail(Player player) {
+        isInJail.put(player, false);
+    }
+
+    public void displayGameState() {
+        System.out.println("Game State: ");
+        for (Player player : players) {
+            displayPlayerStatus(player);
+        }
+    }
+
+    public void displayPlayerStatus(Player player) {
+        System.out.println(player.getName() + ": $" + player.getMoney() +
+                (isPlayerInJail(player) ? " (In Jail)" : ""));
+    }
 }
 
     

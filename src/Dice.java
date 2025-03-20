@@ -56,4 +56,12 @@ public class Dice {
     public int roll() {
         return rollDice();
     }
+
+    public int getDie1Value() {
+        return die1.getDieValue();
+    }
+
+    public int getDie2Value() {
+        return die2.getDieValue();
+    }
 }

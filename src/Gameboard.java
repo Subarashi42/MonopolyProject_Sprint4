@@ -7,6 +7,7 @@ public class Gameboard {
 It has a list of spaces that represent the different spaces on the board.
  */
     private List<Space> spaces;
+    private Map<Integer, String> propertyOwnership;
 
     public Gameboard() {
         spaces = new ArrayList<>();
@@ -84,6 +85,14 @@ It has a list of spaces that represent the different spaces on the board.
 
     public void setSpaces(List<Space> spaces) {
         this.spaces = spaces;
+    }
+
+    public Map<Integer, String> getPropertyOwnership() {
+        return propertyOwnership;
+    }
+
+    public void setPropertyOwnership(Map<Integer, String> propertyOwnership) {
+        this.propertyOwnership = propertyOwnership;
     }
     // Placeholder for future property management functionality
 }

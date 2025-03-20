@@ -187,4 +187,7 @@ public class Player {
         }
     }
 
+    public void deductMoney(int amount) {
+        money -= amount;
+    }
 }
