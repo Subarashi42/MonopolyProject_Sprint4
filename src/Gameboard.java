@@ -57,7 +57,7 @@ It has a list of spaces that represent the different spaces on the board.
     }
 
     public Space getspace(int position) {
-        return spaces.get(position);
+        return spaces.get(position); // Retrieves the space by its position.
     }
 
     public void printBoard() {
