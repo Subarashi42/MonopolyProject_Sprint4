@@ -5,11 +5,16 @@ public class Player {
     private int money;
     private int position;
 
+    // How many times the player has rolled, used to check for whose turn it is
+    private int turnCounter;
+
     private Dice dice = new Dice();
 
     public Player(String name) {
         this.name = name;
         this.money = 1500; // Starting money for the player
+        this.position = 0; // Starting position on the gameboard
+        this.turnCounter = 0; // Number of turns the player has taken
     }
 
     public String getName() {
@@ -88,7 +93,7 @@ public class Player {
         return name + " has $" + money + " and is on space " + position;
     }
 
-    //gameloop handling code below
+
     /**
      * Starts the game loop where players take turns in the correct order.
      * The game continues until all but one player is bankrupt.
@@ -110,7 +115,6 @@ public class Player {
                 currentPlayerIndex = currentPlayerIndex % players.size();
                 continue;
             }
-
             System.out.println("It's " + currentPlayer.getName() + "'s turn.");
             takeTurn(currentPlayer, gameboard, players);
 
@@ -129,6 +133,7 @@ public class Player {
         return dice.getConsecutiveDoubles() == 3;
     }
 
+
     /**
      * Moves the player across the gameboard based on the dice roll.
      */
@@ -140,9 +145,9 @@ public class Player {
 
 
     /**
-     * Manages a single player's turn, including dice rolls and space interactions.
+     * Handles the player's turn when they roll doubles.
      */
-    public void takeTurn(Player player, Gameboard gameboard, List<Player> players) {
+    public void handleRollingDoubles(Player player, Gameboard gameboard) {
         // Roll dice
         int rollDice = dice.rollDice();
 
@@ -171,7 +176,19 @@ public class Player {
             System.out.println(player.getName() + " rolled doubles and is leaving jail.");
             move(player, rollDice, gameboard);
         }
+    }
 
+    public void takeTurn(Player player, Gameboard gameboard, List<Player> players) {
+        Player playerWithLeastTurns = players.get(0);
+
+        for (Player currentPlayer : players) {
+            if (currentPlayer.turnCounter < playerWithLeastTurns.turnCounter) {
+                playerWithLeastTurns = currentPlayer;
+            }
+        }
+
+        playerWithLeastTurns.turnCounter++;
+        System.out.println(playerWithLeastTurns.getName() + " is starting their turn.");
     }
 
 
