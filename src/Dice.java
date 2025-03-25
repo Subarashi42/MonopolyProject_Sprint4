@@ -43,10 +43,6 @@ public class Dice {
         return consecutiveDoubles;
     }
 
-    // Determines if the player should go to jail for rolling three consecutive doubles.
-    public boolean shouldGoToJail(){
-        return consecutiveDoubles >= 3;
-    }
 
     // Resets the consecutiveDoubles count to zero.
     public void resetConsecutiveDoubles() {

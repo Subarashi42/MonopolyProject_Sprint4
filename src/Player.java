@@ -4,11 +4,17 @@ public class Player {
     private String name;
     private int money;
     private int position;
-    private Die die;
+
+    // How many times the player has rolled, used to check for whose turn it is
+    private int turnCounter;
+
+    private Dice dice = new Dice();
 
     public Player(String name) {
         this.name = name;
         this.money = 1500; // Starting money for the player
+        this.position = 0; // Starting position on the gameboard
+        this.turnCounter = 0; // Number of turns the player has taken
     }
 
     public String getName() {
@@ -41,12 +47,7 @@ public class Player {
      *
      * @return the value of the dice roll
      */
-    public int rollDice() {
-        if (die == null) {
-            die = new Die(6);
-        }
-        return die.roll();
-    }
+
 
 //    // moved from Gameboard class
 //    // is this necessary anymore?
@@ -92,7 +93,7 @@ public class Player {
         return name + " has $" + money + " and is on space " + position;
     }
 
-    //gameloop handling code below
+
     /**
      * Starts the game loop where players take turns in the correct order.
      * The game continues until all but one player is bankrupt.
@@ -114,7 +115,6 @@ public class Player {
                 currentPlayerIndex = currentPlayerIndex % players.size();
                 continue;
             }
-
             System.out.println("It's " + currentPlayer.getName() + "'s turn.");
             takeTurn(currentPlayer, gameboard, players);
 
@@ -124,19 +124,74 @@ public class Player {
     }
 
     /**
-     * Manages a single player's turn, including dice rolls and space interactions.
+     * Checks if a player has rolled three consecutive doubles and should go to jail.
+     *
+     * @return true if the player should go to jail, false otherwise
      */
-    public void takeTurn(Player player, Gameboard gameboard, List<Player> players) {
-        int roll = player.rollDice();
-        System.out.println(player.getName() + " rolled a " + roll + ".");
-
-        // Move player and print position
-        int newPosition = (player.getPosition() + roll) % gameboard.getSpaces().size();
-        player.setPosition(newPosition);
-        System.out.println(player.getName() + " moved to " + gameboard.getspace(newPosition).getName() + ".");
-
-        handleSpace(player, gameboard.getspace(newPosition), players);
+    public boolean shouldGoToJail()
+    {
+        return dice.getConsecutiveDoubles() == 3;
     }
+
+
+    /**
+     * Moves the player across the gameboard based on the dice roll.
+     */
+    public void move(Player player, int rollDice, Gameboard gameboard) {
+        int newPosition = (player.getPosition() + rollDice) % gameboard.getSpaces().size();
+        player.setPosition(newPosition);
+    }
+
+
+
+    /**
+     * Handles the player's turn when they roll doubles.
+     */
+    public void handleRollingDoubles(Player player, Gameboard gameboard) {
+        // Roll dice
+        int rollDice = dice.rollDice();
+
+        // Check for consecutive doubles
+        if(shouldGoToJail())
+        {
+            System.out.println(player.getName() + " rolled three consecutive doubles and is going to jail!");
+            player.setPosition(10);  // Jail position
+            dice.resetConsecutiveDoubles();
+        }
+
+        // If they roll doubles, they get another turn
+        if (dice.getDie1Value() == dice.getDie2Value()) {
+            System.out.println(player.getName() + " rolled doubles! Roll again.");
+            move(player, rollDice, gameboard);
+        }
+
+        // If in jail and did not roll doubles, skip turn
+        if (player.getPosition() == 10 && dice.getDie1Value() != dice.getDie2Value()) {
+            System.out.println(player.getName() + " is in jail and did not roll doubles. Skip turn.");
+            return;
+        }
+
+        // If in jail and rolled doubles, leave jail and move based on dice roll
+        if (player.getPosition() == 10 && dice.getDie1Value() == dice.getDie2Value()) {
+            System.out.println(player.getName() + " rolled doubles and is leaving jail.");
+            move(player, rollDice, gameboard);
+        }
+    }
+
+    public void takeTurn(Player player, Gameboard gameboard, List<Player> players) {
+        Player playerWithLeastTurns = players.get(0);
+
+        for (Player currentPlayer : players) {
+            if (currentPlayer.turnCounter < playerWithLeastTurns.turnCounter) {
+                playerWithLeastTurns = currentPlayer;
+            }
+        }
+
+        playerWithLeastTurns.turnCounter++;
+        System.out.println(playerWithLeastTurns.getName() + " is starting their turn.");
+    }
+
+
 
     /**
      * Handles interactions based on the type of space a player lands on.

@@ -37,7 +37,7 @@ public abstract class Space {
 
     // method for landing on a special space (go, jail, etc.)
     public void playerOnSpecialSpace(){
-        System.out.println("Player landed on " + name);
+        System.out.println("Player landed on " );
     }
 
     // method for landing on a property
