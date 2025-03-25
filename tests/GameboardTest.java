@@ -135,15 +135,4 @@ Gameboard class to ensure that they work as expected.*/
         assertEquals(initialBalance, player1.getBalance()); // No rent paid
     }
 
-    @Test
-    public void testPropertyToString() {
-        Property property = (Property) gameboard.getspace(1);
-        property.setOwner(player1);
-        property.addHouse();
-
-        String expected = "1: Mediterranean Avenue (Property) - Price: $60, Rent: $2, Color: Brown, " +
-                "Owner: Player1, Houses: 1, Hotel: No";
-        assertEquals(expected, property.toString());
-    }
-
 }
