@@ -108,7 +108,7 @@ public class Player implements List<Player> {
     }
 
     public void move(Player player, int rollDice, Gameboard gameboard) {
-        int newPosition = (player.getPosition() + rollDice) % gameboard.getSpaces().size();
+        int newPosition = (player.getPosition() + rollDice) % gameboard.size();
         player.setPosition(newPosition);
     }
 
@@ -313,5 +313,26 @@ public class Player implements List<Player> {
     @Override
     public List<Player> subList(int fromIndex, int toIndex) {
         return List.of();
+    }
+
+    public void decreaseBalance(int price) {
+        money -= price;
+    }
+
+    public boolean isInJail() {
+        if (position == 10) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void getOutOfJail() {
+        position = 10;
+    }
+
+    public void increaseBalance(int i) {
+        money += i;
     }
 }

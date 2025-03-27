@@ -5,7 +5,13 @@ public interface ChestAndCardSpot {
 
 public void cards();
 
-public String  shuffleCards();
+    public static String shuffleCards() {
+        if (Math.random() < 0.5) {
+            return "Advance to Go (Collect $200).";
+        } else {
+            return "Bank error in your favor. Collect $200.";
+        }
+    }
 
 
 }
