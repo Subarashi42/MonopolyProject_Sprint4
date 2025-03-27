@@ -60,4 +60,8 @@ public class Dice {
     public int getDie2Value() {
         return die2.getDieValue();
     }
+
+    public boolean shouldGoToJail() {
+        return consecutiveDoubles == 3;
+    }
 }

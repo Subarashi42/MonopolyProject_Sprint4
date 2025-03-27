@@ -1,13 +1,15 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Tokens {
     /*
-        * This class represents the tokens for the Monopoly game.
-        * It has a list of available tokens and assigns a random token to a player.
+     * This class represents the tokens for the Monopoly game.
+     * It has a list of available tokens and ensures that players can only choose from those that remain.
      */
 
     public static final String[] TOKENS = {
-            "Top Hat", "Thimble", "Iron", "Boot", "Battleship", "Cannon", "Race Car","Scottie Dog", "Wheelbarrow"
+            "Top Hat", "Thimble", "Iron", "Boot", "Battleship",
+            "Cannon", "Race Car", "Scottie Dog", "Wheelbarrow"
     };
 
     private static ArrayList<String> availableTokens = new ArrayList<>();
@@ -16,26 +18,33 @@ public class Tokens {
 
     // Initialize the available tokens
     public static void initializeTokens() {
-        for (String token : TOKENS) {
-            availableTokens.add(token);
+        availableTokens.clear(); // Reset the list
+        availableTokens.addAll(Arrays.asList(TOKENS));
+    }
+
+    // Checks if a token is still available for selection
+    public static boolean isTokenAvailable(String token) {
+        return availableTokens.contains(token);
+    }
+
+    // Assigns a token to a player if it's available
+    public static boolean assignToken(String token) {
+        if (availableTokens.contains(token)) {
+            availableTokens.remove(token);
+            return true;
         }
+        return false;
+    }
+
+    // Displays the list of remaining available tokens
+    public static void displayAvailableTokens() {
+        System.out.println("Available tokens: " + availableTokens);
     }
 
     // Constructor for setting owner and board position
     public Tokens() {
-        this.owner = owner;
-        this.boardPosition = boardPosition;
-    }
-
-    // Assign a random token to a player
-    public static String assignToken() {
-        if (availableTokens.size() == 0) {
-            return "No tokens available"; // Could throw an exception instead
-        }
-        int randomIndex = (int) (Math.random() * availableTokens.size());
-        String token = availableTokens.get(randomIndex);
-        availableTokens.remove(randomIndex); // Remove the token once assigned
-        return token;
+        this.owner = null;
+        this.boardPosition = 0;
     }
 
     // Getter for owner
@@ -64,4 +73,3 @@ public class Tokens {
         return owner + " - " + boardPosition;
     }
 }
-
