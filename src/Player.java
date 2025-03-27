@@ -1,6 +1,9 @@
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
-public class Player {
+public class Player implements List<Player> {
     private String name;
     private int money;
     private int position;
@@ -14,6 +17,9 @@ public class Player {
         this.position = 0;  // Starting position on the gameboard
         this.turnCounter = 0; // Number of turns the player has taken
         this.token = null; // Token starts as null
+    }
+
+    public Player() {
     }
 
     public String getName() {
@@ -95,35 +101,6 @@ public class Player {
 
     public void receiveRent(int amount) {
         money += amount;
-    }
-
-    /**
-     * Starts the game loop where players take turns in the correct order.
-     * The game continues until all but one player is bankrupt.
-     */
-    public void startGame(List<Player> players, Gameboard gameboard) {
-        boolean gameActive = true;
-        int currentPlayerIndex = 0;
-
-        while (gameActive) {
-            Player currentPlayer = players.get(currentPlayerIndex);
-
-            // Skip bankrupt players
-            if (currentPlayer.getMoney() <= 0) {
-                players.remove(currentPlayer);
-                if (players.size() == 1) {
-                    System.out.println(players.get(0).getName() + " wins the game!");
-                    break;
-                }
-                currentPlayerIndex = currentPlayerIndex % players.size();
-                continue;
-            }
-            System.out.println("It's " + currentPlayer.getName() + "'s turn.");
-            takeTurn(currentPlayer, gameboard, players);
-
-            // Move to next player
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-        }
     }
 
     public boolean shouldGoToJail() {
@@ -220,5 +197,121 @@ public class Player {
 
     public void deductMoney(int amount) {
         money -= amount;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public Iterator<Player> iterator() {
+        return null;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return new Object[0];
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return null;
+    }
+
+    @Override
+    public boolean add(Player player) {
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Player> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends Player> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public Player get(int index) {
+        return null;
+    }
+
+    @Override
+    public Player set(int index, Player element) {
+        return null;
+    }
+
+    @Override
+    public void add(int index, Player element) {
+
+
+    }
+
+    @Override
+    public Player remove(int index) {
+        return null;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public ListIterator<Player> listIterator() {
+        return null;
+    }
+
+    @Override
+    public ListIterator<Player> listIterator(int index) {
+        return null;
+    }
+
+    @Override
+    public List<Player> subList(int fromIndex, int toIndex) {
+        return List.of();
     }
 }

@@ -133,6 +133,7 @@ Gameboard class to ensure that they work as expected.*/
         initialBalance = player1.getBalance();
         property.onLand(player1);
         assertEquals(initialBalance, player1.getBalance()); // No rent paid
+
     }
 
 }

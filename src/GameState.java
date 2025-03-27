@@ -17,20 +17,49 @@ public class GameState {
     private Map<Player, Boolean> isInJail;
     private boolean gameActive;
 
-    public GameState(List<Player> players, Gameboard board) {
-        this.players = players;
-        this.board = board;
-        this.dice = new Dice();
-        this.communityChestCards = new CommunityChestCards();
-        this.chanceCards = new ChanceCards();
-        this.isInJail = new HashMap<>();
-        for (Player player : players) {
-            isInJail.put(player, false);
+    public GameState() {
+            this.players = new Player();  // Initialize players
+            this.board = new Gameboard();  // Initialize board
+            this.dice = new Dice();
+            this.communityChestCards = new CommunityChestCards();
+            this.chanceCards = new ChanceCards();
+            this.isInJail = new HashMap<>();
+            for (Player player : players) {
+                isInJail.put(player, false);
+            }
+            this.gameActive = true;
+            this.currentPlayerIndex = 0;
+            communityChestCards.cards();
+            chanceCards.cards();
+    }
+
+    /**
+     * Starts the game loop where players take turns in the correct order.
+     * The game continues until all but one player is bankrupt.
+     */
+    public void startGame(List<Player> players, Gameboard gameboard) {
+        boolean gameActive = true;
+        int currentPlayerIndex = 0;
+
+        while (gameActive) {
+            Player currentPlayer = players.get(currentPlayerIndex);
+
+            // Skip bankrupt players
+            if (currentPlayer.getMoney() <= 0) {
+                players.remove(currentPlayer);
+                if (players.size() == 1) {
+                    System.out.println(players.get(0).getName() + " wins the game!");
+                    break;
+                }
+                currentPlayerIndex = currentPlayerIndex % players.size();
+                continue;
+            }
+            System.out.println("It's " + currentPlayer.getName() + "'s turn.");
+            currentPlayer.takeTurn(currentPlayer, gameboard, players);
+
+            // Move to next player
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         }
-        this.gameActive = true;
-        this.currentPlayerIndex = 0;
-        communityChestCards.cards();
-        chanceCards.cards();
     }
 
     public List<Player> getPlayers() {
@@ -108,6 +137,45 @@ public class GameState {
     public void displayPlayerStatus(Player player) {
         System.out.println(player.getName() + ": $" + player.getMoney() +
                 (isPlayerInJail(player) ? " (In Jail)" : ""));
+    }
+
+    public void skipBankrupt(Player alice) {
+        players.remove(alice);
+    }
+
+    public Object getDice() {
+        return dice;
+    }
+    public void setDice(Dice dice) {
+        this.dice = dice;
+    }
+
+    public CommunityChestCards getCommunityChestCards() {
+        return communityChestCards;
+    }
+    public ChanceCards getChanceCards() {
+        return chanceCards;
+    }
+    public void setGameActive(boolean gameActive) {
+        this.gameActive = gameActive;
+    }
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+    public void setBoard(Gameboard board) {
+        this.board = board;
+    }
+
+    public Collection<Object> getIsInJail() {
+        return Collections.singleton(isInJail.values());
+    }
+
+    public boolean getGameActive() {
+        return gameActive;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
     }
 }
 

@@ -11,7 +11,6 @@ public class Tokens {
             "Top Hat", "Thimble", "Iron", "Boot", "Battleship",
             "Cannon", "Race Car", "Scottie Dog", "Wheelbarrow"
     };
-
     private static ArrayList<String> availableTokens = new ArrayList<>();
     private String owner;
     private int boardPosition;
@@ -45,6 +44,13 @@ public class Tokens {
     public Tokens() {
         this.owner = null;
         this.boardPosition = 0;
+    }
+
+    public static char[] assignToken() {
+        if (availableTokens.size() > 0) {
+            return availableTokens.remove(0).toCharArray();
+        }
+        return null;
     }
 
     // Getter for owner

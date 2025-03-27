@@ -6,8 +6,8 @@ public class Property extends Space {
     private int houses;
     private boolean hasHotel;
 
-    public Property(String name, int position, int price, int rent, String colorGroup) {
-        super(name, position, "Property");
+    public Property(String name, int position, int price) {
+        super(name, position, "");
         this.price = price;
         this.rent = rent;
         this.colorGroup = colorGroup;
