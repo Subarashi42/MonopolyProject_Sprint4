@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Gameboard {
 /* this class represents the gameboard for the Monopoly game.
@@ -79,10 +77,6 @@ It has a list of spaces that represent the different spaces on the board.
         System.out.println(board.getspace(30));
     }
 
-    public List<Space> getSpaces() {
-        return spaces;
-    }
-
     public void setSpaces(List<Space> spaces) {
         this.spaces = spaces;
     }
@@ -93,6 +87,14 @@ It has a list of spaces that represent the different spaces on the board.
 
     public void setPropertyOwnership(Map<Integer, String> propertyOwnership) {
         this.propertyOwnership = propertyOwnership;
+    }
+
+    public int size() {
+        return spaces.size();
+    }
+
+    public Gameboard getSpaces() {
+        return this;
     }
     // Placeholder for future property management functionality
 }

@@ -11,10 +11,14 @@ import java.util.*;
 public class CommunityChestCards implements ChestAndCardSpot {
 
 
-    private Map<String, String> communityChestCards;
+    private static Map<String, String> communityChestCards;
 
     public CommunityChestCards() {
         this.communityChestCards = new HashMap<>();
+    }
+
+    public static void drawCard(Player player1) {
+        System.out.println("Player " + player1.getName() + " drew a Community Chest card: " + shuffleCards());
     }
 
     public Map<String, String> getCommunityChestCards() {
@@ -45,7 +49,7 @@ public class CommunityChestCards implements ChestAndCardSpot {
         communityChestCards.put("Card16", "You inherit $100.");
     }
 
-    public String shuffleCards() {
+    public static String shuffleCards() {
         Random rand = new Random();
         List<String> cards = new ArrayList<>(communityChestCards.keySet());
         String randomCard = cards.get(rand.nextInt(cards.size()));

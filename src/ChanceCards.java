@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class ChanceCards implements ChestAndCardSpot {
 
-    private Map<String, String> chanceCards;
+    private static Map<String, String> chanceCards;
 
     public ChanceCards()
     {
@@ -48,11 +48,15 @@ public class ChanceCards implements ChestAndCardSpot {
         chanceCards.put("Card16", "Advance Token to Nearest Railroad and Pay Owner Twice the Rental to Which He is Otherwise Entitled. If Railroad is Unowned, You May Buy it from the Bank.");
     }
 
-    public String shuffleCards() {
+    public static String shuffleCards() {
         Random rand = new Random();
         List<String> cards = new ArrayList<>(chanceCards.keySet());
         String randomCard = cards.get(rand.nextInt(cards.size()));
 
         return chanceCards.get(randomCard);
+    }
+
+    public static void drawCard(Player player1) {
+        System.out.println("Player " + player1.getName() + " drew a Chance card: " + shuffleCards());
     }
 }

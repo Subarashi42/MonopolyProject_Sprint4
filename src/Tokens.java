@@ -53,6 +53,21 @@ public class Tokens {
         return null;
     }
 
+    public static boolean chooseToken(Player player1, String raceCar) {
+        return false;
+    }
+
+    public static void moveToken(Player player, int position) {
+    }
+
+    public static String getavailabletokens() {
+        if (availableTokens.size() > 0) {
+            return availableTokens.toString();
+        }
+        else
+        return "No tokens available";
+    }
+
     // Getter for owner
     public String getOwner() {
         return owner;
