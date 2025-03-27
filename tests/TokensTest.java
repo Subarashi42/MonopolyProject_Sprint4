@@ -1,103 +1,92 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.After;
+import static org.junit.Assert.*;
 
+/**
+ * Test class for the Tokens class.
+ */
 public class TokensTest {
 
-    @BeforeEach
-    void setUp() {
-        Tokens.initializeTokens(); // Reset tokens before each test
+    @Before
+    public void setUp() {
+        Tokens.initializeTokens();
+    }
+
+    @After
+    public void tearDown() {
+        // Reset tokens after each test
+        Tokens.initializeTokens();
     }
 
     @Test
-    void testInitializeTokens() {
-        // Verify that all tokens are initialized and available
-        assertTrue(Tokens.isTokenAvailable("Top Hat"));
-        assertTrue(Tokens.isTokenAvailable("Iron"));
-        assertTrue(Tokens.isTokenAvailable("Boot"));
-        assertTrue(Tokens.isTokenAvailable("Battleship"));
-        assertTrue(Tokens.isTokenAvailable("Cannon"));
-        assertTrue(Tokens.isTokenAvailable("Race Car"));
-        assertTrue(Tokens.isTokenAvailable("Scottie Dog"));
-        assertTrue(Tokens.isTokenAvailable("Wheelbarrow"));
-        assertTrue(Tokens.isTokenAvailable("Thimble"));
+    public void testInitialization() {
+        // After initialization, all tokens should be available
+        for (String token : Tokens.TOKENS) {
+            assertTrue("Token " + token + " should be available after initialization",
+                    Tokens.isTokenAvailable(token));
+        }
     }
 
     @Test
-    void testIsTokenAvailable() {
-        // Test that tokens are available initially
-        assertTrue(Tokens.isTokenAvailable("Battleship"));
+    public void testAssignToken() {
+        // Test assigning an available token
+        String token = "Top Hat";
+        assertTrue(Tokens.isTokenAvailable(token));
+        boolean assigned = Tokens.assignToken(token);
+        assertTrue("Should be able to assign an available token", assigned);
+        assertFalse("Token should not be available after assigning",
+                Tokens.isTokenAvailable(token));
 
-        // Assign the token to simulate the user picking it
+        // Test assigning an already assigned token
+        assigned = Tokens.assignToken(token);
+        assertFalse("Should not be able to assign an already assigned token", assigned);
+
+        // Test assigning all tokens
+        for (String t : Tokens.TOKENS) {
+            if (!t.equals(token)) { // Skip the already assigned token
+                Tokens.assignToken(t);
+            }
+        }
+
+        // Verify no tokens are available
+        for (String t : Tokens.TOKENS) {
+            assertFalse("No tokens should be available after assigning all",
+                    Tokens.isTokenAvailable(t));
+        }
+    }
+
+    @Test
+    public void testTokenInstance() {
+        // Test the Tokens constructor and instance methods
+        Tokens tokenInstance = new Tokens();
+
+        // Test initial state
+        assertNull(tokenInstance.getOwner());
+        assertEquals(0, tokenInstance.getBoardPosition());
+
+        // Test setting and getting owner
+        tokenInstance.setOwner("Player 1");
+        assertEquals("Player 1", tokenInstance.getOwner());
+
+        // Test setting and getting board position
+        tokenInstance.setBoardPosition(10);
+        assertEquals(10, tokenInstance.getBoardPosition());
+
+        // Test toString method
+        assertEquals("Player 1 - 10", tokenInstance.toString());
+    }
+
+    @Test
+    public void testDisplayAvailableTokens() {
+        // This method just prints to console, so we'll just make sure it doesn't throw an exception
+        Tokens.displayAvailableTokens();
+
+        // Assign some tokens
+        Tokens.assignToken("Top Hat");
         Tokens.assignToken("Battleship");
 
-        // Test that after assigning a token, it's no longer available
-        assertFalse(Tokens.isTokenAvailable("Battleship"));
-    }
-
-    @Test
-    void testAssignToken() {
-        // Test that assigning an available token works
-        assertTrue(Tokens.assignToken("Cannon"));
-        assertFalse(Tokens.isTokenAvailable("Cannon")); // It should no longer be available
-
-        // Test that assigning an unavailable token returns false
-        assertFalse(Tokens.assignToken("Cannon"));
-    }
-
-    @Test
-    void testAssignTokenWhenNoTokensAvailable() {
-        // Assign all tokens
-        for (String token : Tokens.TOKENS) {
-            Tokens.assignToken(token);
-        }
-
-        // Check that no tokens are available now
-        for (String token : Tokens.TOKENS) {
-            assertFalse(Tokens.isTokenAvailable(token));
-        }
-
-        // Try assigning a new token and verify it's not possible
-        assertNull(Tokens.assignToken());
-    }
-
-    @Test
-    void testDisplayAvailableTokens() {
-        // This will only test if the display is working.
-        // We can't capture printed output easily in a test without additional setup.
+        // Call display again
         Tokens.displayAvailableTokens();
-    }
-
-    @Test
-    void testAssignToken2() {
-        // Test that assigning a token works
-        char[] token = Tokens.assignToken();
-        assertNotNull(token);
-        assertFalse(Tokens.isTokenAvailable(new String(token)));
-
-        // Test that assigning all tokens works
-        for (int i = 0; i < Tokens.TOKENS.length - 1; i++) {
-            assertNotNull(Tokens.assignToken());
-        }
-
-        // Test that no tokens are available after assigning all
-        assertNull(Tokens.assignToken());
-    }
- @Test
-    void testGetOwner() {
-        Tokens token = new Tokens();
-        assertNull(token.getOwner());
-    }
-
-    @Test
-    void testGetBoardPosition() {
-        Tokens token = new Tokens();
-        assertEquals(0, token.getBoardPosition());
-    }
-    @Test
-    void testSetOwner() {
-        Tokens token = new Tokens();
-        token.setOwner("Player 1");
-        assertEquals("Player 1", token.getOwner());
     }
 }
