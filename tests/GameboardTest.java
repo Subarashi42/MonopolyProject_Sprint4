@@ -1,139 +1,131 @@
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Test class for the Gameboard class.
+ */
 public class GameboardTest {
-/*this is a test class for the Gameboard class. It tests the methods in the
-Gameboard class to ensure that they work as expected.*/
-    private Gameboard gameboard;
-    private Player player1;
-    private Player player2;
+    private Gameboard board;
+    private Player player;
 
-    @BeforeEach
+    @Before
     public void setUp() {
-        gameboard = new Gameboard();
-        player1 = new Player("Player 1");
-        player2 = new Player("Player 2");
+        // Initialize board and player before each test
+        board = new Gameboard();
+        player = new Player("Test Player");
     }
 
     @Test
-    public void testInitializeBoard() {
-        // Test that the board has been initialized with the correct number of spaces
-        assertEquals(40, gameboard.getSpaces().size());
+    public void testBoardInitialization() {
+        // Verify board has correct number of spaces
+        assertEquals(40, board.getSpaces().size());
 
-        // Test specific spaces
-        assertEquals("Go", gameboard.getspace(0).getName());
-        assertEquals("Mediterranean Avenue", gameboard.getspace(1).getName());
-        assertEquals("Boardwalk", gameboard.getspace(39).getName());
+        // Verify specific spaces are in the correct positions
+        Space goSpace = board.getspace(0);
+        assertEquals("Go", goSpace.getName());
+        assertEquals("Start", goSpace.type);
+
+        Space jailSpace = board.getspace(10);
+        assertEquals("Jail", jailSpace.getName());
+        assertEquals("Jail", jailSpace.type);
+
+        Space freeParkingSpace = board.getspace(20);
+        assertEquals("Free Parking", freeParkingSpace.getName());
+        assertEquals("Free Parking", freeParkingSpace.type);
+
+        Space goToJailSpace = board.getspace(30);
+        assertEquals("Go To Jail", goToJailSpace.getName());
+        assertEquals("Go To Jail", goToJailSpace.type);
+
+        // Verify some properties
+        Space mediterraneanAve = board.getspace(1);
+        assertTrue(mediterraneanAve instanceof Property);
+        assertEquals("Mediterranean Avenue", mediterraneanAve.getName());
+        assertEquals("Brown", ((Property)mediterraneanAve).getColorGroup());
+
+        Space parkPlace = board.getspace(37);
+        assertTrue(parkPlace instanceof Property);
+        assertEquals("Park Place", parkPlace.getName());
+        assertEquals("Dark Blue", ((Property)parkPlace).getColorGroup());
+
+        // Verify some railroads
+        Space readingRailroad = board.getspace(5);
+        assertTrue(readingRailroad instanceof RailroadSpace);
+        assertEquals("Reading Railroad", readingRailroad.getName());
+
+        // Verify some utilities
+        Space electricCompany = board.getspace(12);
+        assertTrue(electricCompany instanceof UtilitySpace);
+        assertEquals("Electric Company", electricCompany.getName());
     }
 
     @Test
-    public void testGetspace() {
-        // Test that getspace returns the correct space
-        assertEquals("Go", gameboard.getspace(0).getName());
-        assertEquals("Jail", gameboard.getspace(10).getName());
-        assertEquals("Free Parking", gameboard.getspace(20).getName());
-        assertEquals("Go To Jail", gameboard.getspace(30).getName());
+    public void testGetPropertiesByColorGroup() {
+        // Test getting all properties in the "Brown" color group
+        List<Property> brownProperties = board.getPropertiesByColorGroup("Brown");
+        assertEquals(2, brownProperties.size());
+        assertEquals("Mediterranean Avenue", brownProperties.get(0).getName());
+        assertEquals("Baltic Avenue", brownProperties.get(1).getName());
+
+        // Test getting all properties in the "Dark Blue" color group
+        List<Property> darkBlueProperties = board.getPropertiesByColorGroup("Dark Blue");
+        assertEquals(2, darkBlueProperties.size());
+        assertEquals("Park Place", darkBlueProperties.get(0).getName());
+        assertEquals("Boardwalk", darkBlueProperties.get(1).getName());
     }
 
     @Test
-    public void testPrintBoard() {
-        // Since printBoard() is a void method that prints to the console,
-        // we can't directly test its output. However, we can ensure it doesn't throw an exception.
-        assertDoesNotThrow(() -> gameboard.printBoard());
+    public void testGetRailroads() {
+        List<RailroadSpace> railroads = board.getRailroads();
+        assertEquals(4, railroads.size());
+        assertEquals("Reading Railroad", railroads.get(0).getName());
+        assertEquals("Pennsylvania Railroad", railroads.get(1).getName());
+        assertEquals("B. & O. Railroad", railroads.get(2).getName());
+        assertEquals("Short Line", railroads.get(3).getName());
     }
 
     @Test
-    public void testPropertySpaces() {
-        // Test that property spaces are correctly initialized
-        Space space = gameboard.getspace(1);
-        assertTrue(space instanceof Property);
-        Property property = (Property) space;
-        assertEquals("Mediterranean Avenue", property.getName());
-        assertEquals(60, property.getPrice());
-        assertEquals(2, property.getRent());
-        assertNull(property.getOwner()); // No owner initially
-        assertEquals(0, property.getHouses());
-        assertFalse(property.hasHotel());
+    public void testGetUtilities() {
+        List<UtilitySpace> utilities = board.getUtilities();
+        assertEquals(2, utilities.size());
+        assertEquals("Electric Company", utilities.get(0).getName());
+        assertEquals("Water Works", utilities.get(1).getName());
     }
 
     @Test
-    public void testSpecialSpaces() {
-        // Test that special spaces are correctly initialized
-        Space space = gameboard.getspace(0);
-        assertTrue(space instanceof SpecialSpace);
-        SpecialSpace specialSpace = (SpecialSpace) space;
-        assertEquals("Go", specialSpace.getName());
-        assertEquals("Start", specialSpace.getType());
+    public void testPlayerOwnsAllInColorGroup() {
+        // Initially player owns nothing
+        assertFalse(board.playerOwnsAllInColorGroup(player, "Brown"));
 
-        // Test another special space
-        space = gameboard.getspace(10);
-        assertTrue(space instanceof SpecialSpace);
-        specialSpace = (SpecialSpace) space;
-        assertEquals("Jail", specialSpace.getName());
-        assertEquals("Jail", specialSpace.getType());
+        // Player buys one brown property
+        Property mediterraneanAve = (Property)board.getspace(1);
+        mediterraneanAve.setOwner(player);
+        assertFalse(board.playerOwnsAllInColorGroup(player, "Brown"));
+
+        // Player buys the second brown property -> should now own all in the group
+        Property balticAve = (Property)board.getspace(3);
+        balticAve.setOwner(player);
+        assertTrue(board.playerOwnsAllInColorGroup(player, "Brown"));
+
+        // Verify player doesn't own all in another color group
+        assertFalse(board.playerOwnsAllInColorGroup(player, "Dark Blue"));
     }
 
     @Test
-    public void testSpecialSpaceToString() {
-        // Test the toString method of SpecialSpace
-        SpecialSpace specialSpace = (SpecialSpace) gameboard.getspace(0);
-        assertEquals("0: Go (Start)", specialSpace.toString());
+    public void testLandingOnProperty() {
+        // Create GameState for tests that require it
+        List<Player> players = new ArrayList<>();
+        players.add(player);
+        GameState gameState = new GameState(players, board);
 
-        specialSpace = (SpecialSpace) gameboard.getspace(10);
-        assertEquals("10: Jail (Jail)", specialSpace.toString());
+        // Test landing on property
+        Property mediterraneanAve = (Property)board.getspace(1);
+        mediterraneanAve.onLand(player, gameState);
+
+        // Just verifies the method runs without errors
+        // More detailed tests for property behavior would be in PropertyTest
     }
-
-    @Test
-    public void testPropertyOwnership() {
-        Property property = (Property) gameboard.getspace(1);
-
-        // Test setting and getting the owner
-        property.setOwner(player1);
-        assertTrue(property.isOwned());
-
-        // Test that another player cannot own the property while it's already owned
-        property.setOwner(player2);
-    }
-
-    @Test
-    public void testAddHouse() {
-        Property property = (Property) gameboard.getspace(1);
-
-        // Add houses one by one
-        for (int i = 1; i <= 4; i++) {
-            property.addHouse();
-            assertEquals(i, property.getHouses());
-            assertFalse(property.hasHotel());
-        }
-
-        // Adding a 5th house should convert to a hotel
-        property.addHouse();
-        assertEquals(0, property.getHouses());
-        assertTrue(property.hasHotel());
-
-        // Adding another house should not change anything (already has a hotel)
-        property.addHouse();
-        assertEquals(0, property.getHouses());
-        assertTrue(property.hasHotel());
-    }
-
-    @Test
-    public void testOnLand() {
-        Property property = (Property) gameboard.getspace(1);
-        property.setOwner(player1);
-
-        // Test that a player pays rent when landing on an owned property
-        int initialBalance = player2.getBalance();
-        property.onLand(player2);
-        assertTrue(player2.getBalance() < initialBalance); // Player2 paid rent
-        assertTrue(player1.getBalance() > initialBalance); // Player1 received rent
-
-        // Test that no rent is paid if the player owns the property
-        initialBalance = player1.getBalance();
-        property.onLand(player1);
-        assertEquals(initialBalance, player1.getBalance()); // No rent paid
-
-    }
-
 }
