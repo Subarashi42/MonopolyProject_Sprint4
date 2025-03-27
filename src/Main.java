@@ -1,128 +1,222 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Main class to run the Monopoly game.
+ */
 public class Main {
   public static void main(String[] args) {
-    System.out.println("=== MONOPOLY GAME DEMO ===\n");
+    System.out.println("Welcome to Monopoly!");
 
-    // Initialize game components
+    // Initialize the game components
     Gameboard board = new Gameboard();
     Tokens.initializeTokens();
-    Scanner scanner = new Scanner(System.in);
+    Houses houses = new Houses();
+    Hotels hotels = new Hotels();
+    Bank bank = new Bank();
 
     // Create players
-    Player player1 = new Player("Player 1");
-    Player player2 = new Player("Player 2");
+    List<Player> players = createPlayers();
 
-    // Demo token selection
-    System.out.println("Available tokens: " + Tokens.getavailabletokens());
-    demoTokenSelection(player1, player2);
+    // Let players choose tokens
+    assignPlayerTokens(players);
 
-    // Demo board movement and property purchase
-    System.out.println("\n=== BOARD MOVEMENT DEMO ===");
-    demoMovement(board, player1, player2);
+    // Initialize game state
+    GameState gameState = new GameState(players, board);
 
-    // Demo property management
-    System.out.println("\n=== PROPERTY MANAGEMENT DEMO ===");
-    demoPropertyManagement(board, player1);
+    // Main game loop
+    playGame(gameState, houses, hotels, bank);
 
-    // Demo other components
-    System.out.println("\n=== OTHER COMPONENTS DEMO ===");
-    JailSpace jail = new JailSpace();
-    demoJail(jail, player2);
-
-    Hotels hotels = new Hotels();
-    Houses houses = new Houses();
-    Money money = new Money();
-    demoMoneyTransactions(money, player1, player2);
-
-    scanner.close();
-    System.out.println("\nDemo completed!");
+    // End of game
+    announceWinner(players);
   }
 
-  private static void demoTokenSelection(Player player1, Player player2) {
-    // Demo selecting tokens for players
-    boolean success = Tokens.chooseToken(player1, "Race Car");
-    System.out.println(player1.getName() + " chose the Race Car token: " + (success ? "Success!" : "Failed!"));
+  /**
+   * Creates players for the game.
+   *
+   * @return A list of players
+   */
+  private static List<Player> createPlayers() {
+    Scanner scanner = new Scanner(System.in);
+    List<Player> players = new ArrayList<>();
 
-    success = Tokens.chooseToken(player2, "Top Hat");
-    System.out.println(player2.getName() + " chose the Top Hat token: " + (success ? "Success!" : "Failed!"));
+    System.out.println("How many players? (2-8)");
+    int numPlayers = 0;
 
-    // Show remaining tokens
-    System.out.println("Remaining tokens: " + Tokens.getavailabletokens());
+    // Input validation
+    while (numPlayers < 2 || numPlayers > 8) {
+      try {
+        numPlayers = Integer.parseInt(scanner.nextLine());
+        if (numPlayers < 2 || numPlayers > 8) {
+          System.out.println("Please enter a number between 2 and 8.");
+        }
+      } catch (NumberFormatException e) {
+        System.out.println("Please enter a valid number.");
+      }
+    }
+
+    // Create player objects
+    for (int i = 1; i <= numPlayers; i++) {
+      System.out.println("Enter name for Player " + i + ":");
+      String name = scanner.nextLine();
+      players.add(new Player(name));
+    }
+
+    return players;
   }
 
-  private static void demoMovement(Gameboard board, Player player1, Player player2) {
-    // Move player1 to position 1 (Mediterranean Avenue)
-    movePlayer(board, player1, 1);
+  /**
+   * Assigns tokens to players.
+   *
+   * @param players The list of players
+   */
+  private static void assignPlayerTokens(List<Player> players) {
+    Scanner scanner = new Scanner(System.in);
 
-    // Move player2 to position 3 (Baltic Avenue)
-    movePlayer(board, player2, 3);
+    System.out.println("\nChoose your tokens:");
 
-    // Move player1 to Jail (position 10)
-    movePlayer(board, player1, 10);
-  }
+    for (Player player : players) {
+      boolean validTokenSelected = false;
 
-  private static void movePlayer(Gameboard board, Player player, int position) {
-    // Update token position
-    Tokens.moveToken(player, position);
+      while (!validTokenSelected) {
+        Tokens.displayAvailableTokens();
+        System.out.println(player.getName() + ", choose a token:");
+        String token = scanner.nextLine();
 
-    Space space = board.getspace(position);
-    System.out.println(player.getName() + " moved to " + space.getName());
-
-    // If it's a property, try to buy it
-    if (space instanceof Property) {
-      Property property = (Property) space;
-      if (!property.isOwned() && player.getBalance() >= property.getPrice()) {
-        property.setOwner(player);
-        player.decreaseBalance(property.getPrice());
-        System.out.println(player.getName() + " purchased " + property.getName() +
-                " for $" + property.getPrice());
+        validTokenSelected = player.chooseToken(token);
+        if (!validTokenSelected) {
+          System.out.println("Token not available. Please choose another.");
+        }
       }
     }
   }
 
-  private static void demoPropertyManagement(Gameboard board, Player player) {
-    // Assume player owns Mediterranean Avenue (position 1)
-    Property property = (Property) board.getspace(1);
-    if (property.getOwner() == player) {
-      System.out.println(player.getName() + " owns " + property.getName());
+  /**
+   * Main game loop.
+   *
+   * @param gameState The game state
+   * @param houses The houses object
+   * @param hotels The hotels object
+   * @param bank The bank object
+   */
+  private static void playGame(GameState gameState, Houses houses, Hotels hotels, Bank bank) {
+    Scanner scanner = new Scanner(System.in);
+    int turnCount = 0;
+    int maxTurns = 20; // Limit for demonstration purposes
 
-      // Add houses
-      for (int i = 0; i < 4; i++) {
-        property.addHouse();
-        System.out.println("Added house to " + property.getName() +
-                " - Now has " + property.getHouses() + " houses");
+    System.out.println("\nStarting the game!");
+
+    // Main game loop
+    while (gameState.isGameActive() && turnCount < maxTurns && gameState.getPlayers().size() > 1) {
+      Player currentPlayer = gameState.getCurrentPlayer();
+      System.out.println("\n--- Turn " + (turnCount + 1) + " ---");
+      gameState.displayGameState();
+
+      System.out.println("\nPress Enter for " + currentPlayer.getName() + " to take their turn...");
+      scanner.nextLine();
+
+      // Player takes their turn
+      currentPlayer.takeTurn(gameState.getBoard(), gameState);
+
+      // Check for bankrupt players
+      if (currentPlayer.isBankrupt()) {
+        System.out.println(currentPlayer.getName() + " is bankrupt and out of the game!");
+        gameState.getPlayers().remove(currentPlayer);
+        if (gameState.getPlayers().size() == 1) {
+          System.out.println("\nGame over! " + gameState.getPlayers().get(0).getName() + " wins!");
+          break;
+        }
+      } else {
+        // Move to next player
+        gameState.nextTurn();
       }
 
-      // Add hotel (5th house converts to hotel)
-      property.addHouse();
-      System.out.println("Added hotel to " + property.getName() +
-              " - Has hotel: " + property.hasHotel());
+      turnCount++;
+    }
+
+    if (turnCount >= maxTurns) {
+      System.out.println("\nReached maximum number of turns. Game ends.");
     }
   }
 
-  private static void demoJail(JailSpace jail, Player player) {
-    System.out.println(player.getName() + " is going to jail!");
-    jail.sendToJail(player);
-    System.out.println("Player in jail: " + jail.isInJail(player));
+  /**
+   * Announces the winner of the game.
+   *
+   * @param players The list of remaining players
+   */
+  private static void announceWinner(List<Player> players) {
+    if (players.size() == 1) {
+      System.out.println("\n" + players.get(0).getName() + " is the winner!");
+    } else if (players.size() > 1) {
+      // Find player with most assets
+      Player richestPlayer = players.get(0);
+      int highestValue = calculatePlayerValue(richestPlayer);
 
-    System.out.println("Attempting to get out of jail...");
-    jail.getOutOfJail(player);
-    System.out.println("Player in jail: " + jail.isInJail(player));
+      for (int i = 1; i < players.size(); i++) {
+        Player player = players.get(i);
+        int value = calculatePlayerValue(player);
+        if (value > highestValue) {
+          richestPlayer = player;
+          highestValue = value;
+        }
+      }
+
+      System.out.println("\nGame over! " + richestPlayer.getName() +
+              " wins with total assets worth $" + highestValue + "!");
+    } else {
+      System.out.println("\nNo winner determined.");
+    }
   }
 
-  private static void demoMoneyTransactions(Money money, Player player1, Player player2) {
-    int startingBalance1 = player1.getBalance();
-    int startingBalance2 = player2.getBalance();
+  /**
+   * Calculates a player's total value (money + property values).
+   *
+   * @param player The player
+   * @return The player's total value
+   */
+  private static int calculatePlayerValue(Player player) {
+    int value = player.getMoney();
 
-    System.out.println(player1.getName() + " initial balance: $" + startingBalance1);
-    System.out.println(player2.getName() + " initial balance: $" + startingBalance2);
+    // Add property values
+    for (Property property : player.getProperties()) {
+      value += property.getPrice();
+      // Add house/hotel values
+      if (property.hasHotel()) {
+        value += 5 * Houses.getHousePrice(property.getColorGroup());
+      } else {
+        value += property.getHouses() * Houses.getHousePrice(property.getColorGroup());
+      }
+    }
 
-    // Transfer $100 from player1 to player2
-    money.transfer(player1, player2, 100);
+    return value;
+  }
 
-    System.out.println("After transferring $100:");
-    System.out.println(player1.getName() + " new balance: $" + player1.getBalance());
-    System.out.println(player2.getName() + " new balance: $" + player2.getBalance());
+  /**
+   * Simple demonstration mode with pre-defined moves.
+   *
+   * @param gameState The game state
+   */
+  private static void runDemonstration(GameState gameState) {
+    System.out.println("\nRunning demonstration mode...");
+
+    // Pre-defined sequence of turns for demonstration
+    for (int i = 0; i < 10; i++) {
+      Player currentPlayer = gameState.getCurrentPlayer();
+      System.out.println("\n--- Turn " + (i + 1) + " ---");
+
+      // Player takes their turn
+      currentPlayer.takeTurn(gameState.getBoard(), gameState);
+
+      // Move to next player
+      gameState.nextTurn();
+
+      // Short pause between turns
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }
