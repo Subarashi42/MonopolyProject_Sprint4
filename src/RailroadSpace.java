@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class RailroadSpace extends Space {
     private int price;
     private Player owner;
@@ -65,13 +67,23 @@ public class RailroadSpace extends Space {
 
         // Count how many railroads the owner has
         int railroadCount = 0;
-        for (Space space : gameState.getBoard().getSpaces()) {
+        List<Space> spaces = gameState.getBoard().getSpaces();
+
+        for (Space space : spaces) {
             if (space instanceof RailroadSpace) {
                 RailroadSpace railroad = (RailroadSpace) space;
-                if (railroad.getOwner() == owner) {
+                Player railroadOwner = railroad.getOwner();
+
+                // Check if this railroad has the same owner as the current railroad
+                if (railroadOwner != null && railroadOwner.getName().equals(owner.getName())) {
                     railroadCount++;
                 }
             }
+        }
+
+        // Make sure railroadCount is at least 1 if this railroad has an owner
+        if (railroadCount == 0) {
+            railroadCount = 1;
         }
 
         // Calculate rent: 25 for 1 railroad, 50 for 2, 100 for 3, 200 for 4
