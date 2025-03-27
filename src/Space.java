@@ -23,17 +23,6 @@ public abstract class Space {
         return name;
     }
 
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public String getColorGroup() {
-//        return colorGroup;
-//    }
-//
-//    public void setColorGroup(String colorGroup) {
-//        this.colorGroup = colorGroup;
-//    }
 
     // method for landing on a special space (go, jail, etc.)
     public void playerOnSpecialSpace(){
@@ -41,8 +30,17 @@ public abstract class Space {
     }
 
     // method for landing on a property
+    public void playerOnProperty(){
+        System.out.println("Player landed on property " + name);
+    }
     // method for landing on a railroad
+    public void playerOnRailroad(){
+        System.out.println("Player landed on railroad " + name);
+    }
     // method for landing on a card space
+    public void playerOnCardSpace(){
+        System.out.println("Player landed on card space " + name);
+    }
 
     @Override
     public String toString() {
