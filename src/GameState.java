@@ -18,7 +18,7 @@ public class GameState {
     private boolean gameActive;
 
     public GameState(List<Player> players, Gameboard board) {
-            this.players = new Player();  // Initialize players
+            this.players = players; // Initialize players
             this.board = new Gameboard();  // Initialize board
             this.dice = new Dice();
             this.communityChestCards = new CommunityChestCards();
@@ -55,7 +55,7 @@ public class GameState {
                 continue;
             }
             System.out.println("It's " + currentPlayer.getName() + "'s turn.");
-            currentPlayer.takeTurn(currentPlayer, gameboard, players);
+            currentPlayer.takeTurn(gameboard, this);
 
             // Move to next player
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
@@ -179,4 +179,4 @@ public class GameState {
     }
 }
 
-    
+
