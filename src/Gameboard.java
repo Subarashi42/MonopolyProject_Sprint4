@@ -77,7 +77,6 @@ It has a list of spaces that represent the different spaces on the board.
         System.out.println(board.getspace(30));
     }
 
-
     public void setSpaces(List<Space> spaces) {
         this.spaces = spaces;
     }

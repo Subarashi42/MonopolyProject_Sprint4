@@ -11,6 +11,10 @@ public abstract class Space {
         this.type = type;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public Player getOwner() {
         return owner;
     }
@@ -22,7 +26,9 @@ public abstract class Space {
     public String getName() {
         return name;
     }
-
+   public String getColorGroup() {
+        return colorGroup;
+    }
 
     // method for landing on a special space (go, jail, etc.)
     public void playerOnSpecialSpace(){
