@@ -6,9 +6,9 @@ public abstract class Space {
     private String colorGroup;
 
     public Space(String name, int position, String property) {
-        this.name = this.name;
-        this.position = this.position;
-        this.type = type;
+        this.name = name;
+        this.position = position;
+        this.type = property;
     }
 
     public Player getOwner() {
