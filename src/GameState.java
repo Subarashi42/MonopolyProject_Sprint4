@@ -17,14 +17,14 @@ public class GameState {
     private Map<Player, Boolean> isInJail;
     private boolean gameActive;
 
-    public GameState() {
+    public GameState(List<Player> players, Gameboard board) {
             this.players = new Player();  // Initialize players
             this.board = new Gameboard();  // Initialize board
             this.dice = new Dice();
             this.communityChestCards = new CommunityChestCards();
             this.chanceCards = new ChanceCards();
             this.isInJail = new HashMap<>();
-            for (Player player : players) {
+            for (Player player : this.players) {
                 isInJail.put(player, false);
             }
             this.gameActive = true;
