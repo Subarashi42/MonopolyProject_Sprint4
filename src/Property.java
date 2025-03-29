@@ -4,29 +4,74 @@
  */
 public class Property extends Space {
     private int price;
-    private int rent;
     private String colorGroup;
     private Player owner;
     private int houses;
     private boolean hasHotel;
+    private boolean isMortgaged;
+    private TitleDeedCard titleDeed;
 
     /**
-     * Constructs a new property on the Monopoly board.
+     * Constructs a new property on the Monopoly board with a title deed card.
      *
      * @param name The name of the property
      * @param position The position on the board
      * @param price The purchase price of the property
-     * @param rent The base rent of the property
+     * @param baseRent The base rent of the property
      * @param colorGroup The color group the property belongs to
      */
-    public Property(String name, int position, int price, int rent, String colorGroup) {
+    public Property(String name, int position, int price, int baseRent, String colorGroup) {
         super(name, position, "Property");
         this.price = price;
-        this.rent = rent;
         this.colorGroup = colorGroup;
         this.owner = null;  // No owner initially
         this.houses = 0;
         this.hasHotel = false;
+        this.isMortgaged = false;
+
+        // Create corresponding title deed card with rent values
+        // These rent values should be specific to each property in a real implementation
+        int[] houseRents = new int[4];
+        switch (colorGroup) {
+            case "Brown":
+            case "Light Blue":
+                houseRents[0] = baseRent * 5;    // 1 house
+                houseRents[1] = baseRent * 15;   // 2 houses
+                houseRents[2] = baseRent * 45;   // 3 houses
+                houseRents[3] = baseRent * 80;   // 4 houses
+                break;
+            case "Pink":
+            case "Orange":
+                houseRents[0] = baseRent * 5;    // 1 house
+                houseRents[1] = baseRent * 15;   // 2 houses
+                houseRents[2] = baseRent * 45;   // 3 houses
+                houseRents[3] = baseRent * 80;   // 4 houses
+                break;
+            case "Red":
+            case "Yellow":
+                houseRents[0] = baseRent * 5;    // 1 house
+                houseRents[1] = baseRent * 15;   // 2 houses
+                houseRents[2] = baseRent * 45;   // 3 houses
+                houseRents[3] = baseRent * 80;   // 4 houses
+                break;
+            case "Green":
+            case "Dark Blue":
+                houseRents[0] = baseRent * 5;    // 1 house
+                houseRents[1] = baseRent * 15;   // 2 houses
+                houseRents[2] = baseRent * 45;   // 3 houses
+                houseRents[3] = baseRent * 80;   // 4 houses
+                break;
+            default:
+                houseRents[0] = baseRent * 5;    // Default values
+                houseRents[1] = baseRent * 15;
+                houseRents[2] = baseRent * 45;
+                houseRents[3] = baseRent * 80;
+        }
+
+        int houseCost = Houses.getHousePrice(colorGroup);
+        int hotelRent = baseRent * 100;
+
+        this.titleDeed = new TitleDeedCard(name, colorGroup, price, baseRent, houseRents, hotelRent, houseCost);
     }
 
     /**
@@ -47,6 +92,15 @@ public class Property extends Space {
     @Override
     public Player getOwner() {
         return owner;
+    }
+
+    /**
+     * Gets the title deed card for this property.
+     *
+     * @return The title deed card
+     */
+    public TitleDeedCard getTitleDeed() {
+        return titleDeed;
     }
 
     /**
@@ -125,6 +179,25 @@ public class Property extends Space {
     }
 
     /**
+     * Checks if the property is mortgaged.
+     *
+     * @return True if the property is mortgaged, false otherwise
+     */
+    public boolean isMortgaged() {
+        return isMortgaged;
+    }
+
+    /**
+     * Sets the mortgage status of the property.
+     *
+     * @param mortgaged The new mortgage status
+     */
+    public void setMortgaged(boolean mortgaged) {
+        this.isMortgaged = mortgaged;
+        this.titleDeed.setMortgaged(mortgaged);
+    }
+
+    /**
      * Handles what happens when a player lands on this property.
      *
      * @param player The player who landed on the property
@@ -135,9 +208,13 @@ public class Property extends Space {
 
         if (isOwned()) {
             if (owner != player) {
-                int calculatedRent = calculateRent(gameState);
-                System.out.println(player.getName() + " must pay $" + calculatedRent + " rent to " + owner.getName());
-                player.payRent(owner, calculatedRent);
+                if (isMortgaged) {
+                    System.out.println(name + " is mortgaged, no rent is due.");
+                } else {
+                    int calculatedRent = calculateRent(gameState);
+                    System.out.println(player.getName() + " must pay $" + calculatedRent + " rent to " + owner.getName());
+                    player.payRent(owner, calculatedRent);
+                }
             } else {
                 System.out.println(player.getName() + " owns this property.");
             }
@@ -145,14 +222,35 @@ public class Property extends Space {
             System.out.println(name + " is not owned. It costs $" + price);
             // Logic for player to decide to buy would be handled elsewhere
             if (player.getMoney() >= price) {
-                boolean wantToBuy = true; // In a real game, this would be a player decision
+                // In a real game, this would be a player decision
+                // For now we'll assume the player always wants to buy if they can afford it
+                boolean wantToBuy = true; // Simplified for implementation
                 if (wantToBuy) {
                     player.buyProperty(this);
+                } else {
+                    // Auction the property if player doesn't want to buy
+                    Bank bank = gameState.getBank();
+                    if (bank != null) {
+                        bank.auctionProperty(this, gameState.getPlayers());
+                    }
                 }
             } else {
                 System.out.println(player.getName() + " cannot afford to buy " + name);
             }
         }
+    }
+
+    /**
+     * Prompt the player to buy the property.
+     * This is a placeholder for a real UI interaction.
+     *
+     * @param player The player to prompt
+     * @return true if the player wants to buy, false otherwise
+     */
+    private boolean promptToBuy(Player player) {
+        // In a real implementation, this would show a prompt to the player
+        // For now, we'll just return true to simulate the player always buying
+        return true;
     }
 
     /**
@@ -162,32 +260,34 @@ public class Property extends Space {
      * @return The calculated rent
      */
     public int calculateRent(GameState gameState) {
+        if (isMortgaged) {
+            return 0;
+        }
+
         if (houses == 0 && !hasHotel) {
             // Check if all properties in the color group are owned by the same player
             if (gameState.getBoard().playerOwnsAllInColorGroup(owner, colorGroup)) {
-                return rent * 2; // Double rent for a monopoly
+                return titleDeed.getBaseRent() * 2; // Double rent for a monopoly
             }
-            return rent;
+            return titleDeed.getBaseRent();
         } else if (hasHotel) {
-            // Hotel rent values are specific for each property, but for simplicity:
-            return rent * 5; // Typically much higher than 4 houses
+            return titleDeed.getHotelRent();
         } else {
-            // House rent increases progressively
-            switch(houses) {
-                case 1: return rent * 5;
-                case 2: return rent * 15;
-                case 3: return rent * 30;
-                case 4: return rent * 40;
-                default: return rent;
-            }
+            return titleDeed.getHouseRent(houses);
         }
     }
 
     @Override
     public String toString() {
-        return super.toString() + " - Price: $" + price + ", Rent: $" + rent + ", Color: " + colorGroup +
-                ", Owner: " + (owner != null ? owner.getName() : "None") +
-                ", Houses: " + houses + ", Hotel: " + (hasHotel ? "Yes" : "No");
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(" - Price: $").append(price);
+        sb.append(", Color: ").append(colorGroup);
+        sb.append(", Owner: ").append(owner != null ? owner.getName() : "None");
+        sb.append(", Houses: ").append(houses);
+        sb.append(", Hotel: ").append(hasHotel ? "Yes" : "No");
+        sb.append(", Mortgaged: ").append(isMortgaged ? "Yes" : "No");
+        return sb.toString();
     }
 
     /**
@@ -223,16 +323,7 @@ public class Property extends Space {
      * @return The base rent
      */
     public int getRent() {
-        return rent;
-    }
-
-    /**
-     * Sets the base rent of the property.
-     *
-     * @param rent The new base rent
-     */
-    public void setRent(int rent) {
-        this.rent = rent;
+        return titleDeed.getBaseRent();
     }
 
     /**
@@ -250,7 +341,7 @@ public class Property extends Space {
      * @return The mortgage value (half the purchase price)
      */
     public int getMortgageValue() {
-        return price / 2;
+        return titleDeed.getMortgageValue();
     }
 
     /**
@@ -259,7 +350,7 @@ public class Property extends Space {
      * @return The unmortgage cost (mortgage value plus 10% interest)
      */
     public int getUnmortgageCost() {
-        return (int)(getMortgageValue() * 1.1);
+        return titleDeed.getUnmortgageCost();
     }
 
     @Override
