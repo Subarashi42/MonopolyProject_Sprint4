@@ -12,21 +12,27 @@ public class Main {
     // Initialize the game components
     Gameboard board = new Gameboard();
     Tokens.initializeTokens();
+    Bank bank = new Bank();
     Houses houses = new Houses();
     Hotels hotels = new Hotels();
-    Bank bank = new Bank();
 
-    // Create players
+    // Create players (2-4 players)
     List<Player> players = createPlayers();
 
     // Let players choose tokens
     assignPlayerTokens(players);
 
-    // Initialize game state
+    // Initialize game state and give starting money
     GameState gameState = new GameState(players, board);
+    gameState.setBank(bank);
+
+    // Give each player starting money
+    for (Player player : players) {
+      bank.giveStartingMoney(player);
+    }
 
     // Main game loop
-    playGame(gameState, houses, hotels, bank);
+    playGame(gameState);
 
     // End of game
     announceWinner(players);
@@ -41,15 +47,15 @@ public class Main {
     Scanner scanner = new Scanner(System.in);
     List<Player> players = new ArrayList<>();
 
-    System.out.println("How many players? (2-8)");
+    System.out.println("How many players? (2-4)");
     int numPlayers = 0;
 
-    // Input validation
-    while (numPlayers < 2 || numPlayers > 8) {
+    // Input validation - enforce 2-4 player limit
+    while (numPlayers < 2 || numPlayers > 4) {
       try {
         numPlayers = Integer.parseInt(scanner.nextLine());
-        if (numPlayers < 2 || numPlayers > 8) {
-          System.out.println("Please enter a number between 2 and 8.");
+        if (numPlayers < 2 || numPlayers > 4) {
+          System.out.println("Please enter a number between 2 and 4.");
         }
       } catch (NumberFormatException e) {
         System.out.println("Please enter a valid number.");
@@ -96,11 +102,8 @@ public class Main {
    * Main game loop.
    *
    * @param gameState The game state
-   * @param houses The houses object
-   * @param hotels The hotels object
-   * @param bank The bank object
    */
-  private static void playGame(GameState gameState, Houses houses, Hotels hotels, Bank bank) {
+  private static void playGame(GameState gameState) {
     Scanner scanner = new Scanner(System.in);
     int turnCount = 0;
     int maxTurns = 20; // Limit for demonstration purposes
@@ -116,13 +119,12 @@ public class Main {
       System.out.println("\nPress Enter for " + currentPlayer.getName() + " to take their turn...");
       scanner.nextLine();
 
-      // Player takes their turn
-      currentPlayer.takeTurn(gameState.getBoard(), gameState);
+      // Player takes their turn with the updated turn flow
+      playerTurn(currentPlayer, gameState);
 
       // Check for bankrupt players
       if (currentPlayer.isBankrupt()) {
-        System.out.println(currentPlayer.getName() + " is bankrupt and out of the game!");
-        gameState.getPlayers().remove(currentPlayer);
+        gameState.handlePlayerBankruptcy(currentPlayer);
         if (gameState.getPlayers().size() == 1) {
           System.out.println("\nGame over! " + gameState.getPlayers().get(0).getName() + " wins!");
           break;
@@ -137,6 +139,66 @@ public class Main {
 
     if (turnCount >= maxTurns) {
       System.out.println("\nReached maximum number of turns. Game ends.");
+    }
+  }
+
+  /**
+   * Handles a player's turn with the dynamic turn system.
+   *
+   * @param player The player taking a turn
+   * @param gameState The current game state
+   */
+  private static void playerTurn(Player player, GameState gameState) {
+    System.out.println(player.getName() + " is taking their turn.");
+
+    // Check if player is in jail
+    if (gameState.isPlayerInJail(player)) {
+      handleJailTurn(player, gameState);
+      return;
+    }
+
+    // Step 1: Roll the dice
+    int roll = gameState.rollDice();
+    int[] diceValues = gameState.getDiceValues();
+    System.out.println(player.getName() + " rolled " + diceValues[0] + " + " + diceValues[1] + " = " + roll);
+
+    // Check for three doubles (go to jail)
+    if (diceValues[0] == diceValues[1]) {
+      System.out.println(player.getName() + " rolled doubles!");
+
+      Dice dice = (Dice) gameState.getDice();
+      if (dice.getConsecutiveDoubles() == 3) {
+        System.out.println(player.getName() + " rolled three consecutive doubles and is going to jail!");
+        JailSpace.goToJail(player, gameState);
+        return;
+      }
+    } else {
+      // Reset doubles counter if player didn't roll doubles
+      Dice dice = (Dice) gameState.getDice();
+      dice.resetConsecutiveDoubles();
+    }
+
+    // Step 2: Move the player
+    int oldPosition = player.getPosition();
+    int newPosition = (oldPosition + roll) % gameState.getBoard().getSpaces().size();
+    player.setPosition(newPosition);
+
+    // Check if player passed Go
+    if (newPosition < oldPosition) {
+      System.out.println(player.getName() + " passed Go and collects $200!");
+      gameState.getBank().playerPassedGo(player);
+    }
+
+    System.out.println(player.getName() + " moved from " + oldPosition + " to " + newPosition +
+            " (" + gameState.getBoard().getspace(newPosition).getName() + ")");
+
+    // Step 3: Perform actions based on the space landed on
+    player.performTurnActions(gameState);
+
+    // Step 4: If player rolled doubles, they get another turn (unless they're in jail)
+    if (diceValues[0] == diceValues[1] && !gameState.isPlayerInJail(player)) {
+      System.out.println(player.getName() + " rolled doubles and gets another turn!");
+      playerTurn(player, gameState);
     }
   }
 
@@ -193,30 +255,106 @@ public class Main {
   }
 
   /**
-   * Simple demonstration mode with pre-defined moves.
+   * Handles a player's turn when they are in jail.
    *
-   * @param gameState The game state
+   * @param player The player in jail
+   * @param gameState The current game state
    */
-  private static void runDemonstration(GameState gameState) {
-    System.out.println("\nRunning demonstration mode...");
+  private static void handleJailTurn(Player player, GameState gameState) {
+    System.out.println(player.getName() + " is in Jail (Turn " + (player.getTurnsInJail() + 1) + " in jail)");
+    player.setTurnsInJail(player.getTurnsInJail() + 1);
 
-    // Pre-defined sequence of turns for demonstration
-    for (int i = 0; i < 10; i++) {
-      Player currentPlayer = gameState.getCurrentPlayer();
-      System.out.println("\n--- Turn " + (i + 1) + " ---");
+    Scanner scanner = new Scanner(System.in);
+    System.out.println("Options:");
+    System.out.println("1. Pay $50 to get out");
 
-      // Player takes their turn
-      currentPlayer.takeTurn(gameState.getBoard(), gameState);
+    if (player.hasGetOutOfJailFreeCard()) {
+      System.out.println("2. Use Get Out of Jail Free card");
+    }
 
-      // Move to next player
-      gameState.nextTurn();
+    System.out.println("3. Try to roll doubles");
 
-      // Short pause between turns
-      try {
-        Thread.sleep(2000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+    // Simple decision for demonstration
+    int choice;
+    if (player.getMoney() >= 50) {
+      choice = 1; // Pay to get out
+    } else if (player.hasGetOutOfJailFreeCard()) {
+      choice = 2; // Use card
+    } else {
+      choice = 3; // Roll for doubles
+    }
+
+    System.out.println(player.getName() + " chooses option " + choice);
+
+    switch (choice) {
+      case 1: // Pay to get out
+        if (player.getMoney() >= 50) {
+          player.subtractMoney(50);
+          gameState.releaseFromJail(player);
+          player.setTurnsInJail(0);
+          System.out.println(player.getName() + " paid $50 to get out of Jail.");
+
+          // Roll and move
+          int roll = gameState.rollDice();
+          System.out.println(player.getName() + " rolled " + roll);
+          player.move(roll, gameState.getBoard());
+          player.performTurnActions(gameState);
+        } else {
+          System.out.println(player.getName() + " doesn't have enough money to pay the Jail fee.");
+          handleJailOption3(player, gameState); // Fall back to option 3
+        }
+        break;
+
+      case 2: // Use Get Out of Jail Free card
+        if (player.hasGetOutOfJailFreeCard()) {
+          player.setHasGetOutOfJailFreeCard(false);
+          gameState.releaseFromJail(player);
+          player.setTurnsInJail(0);
+          System.out.println(player.getName() + " used a Get Out of Jail Free card.");
+
+          // Roll and move
+          int roll = gameState.rollDice();
+          System.out.println(player.getName() + " rolled " + roll);
+          player.move(roll, gameState.getBoard());
+          player.performTurnActions(gameState);
+        } else {
+          handleJailOption3(player, gameState); // Fall back to option 3
+        }
+        break;
+
+      case 3: // Try to roll doubles
+      default:
+        handleJailOption3(player, gameState);
+        break;
+    }
+  }
+
+  /**
+   * Helper method to handle the "roll for doubles" jail option.
+   *
+   * @param player The player in jail
+   * @param gameState The current game state
+   */
+  private static void handleJailOption3(Player player, GameState gameState) {
+    int roll = gameState.rollDice();
+    int[] diceValues = gameState.getDiceValues();
+    System.out.println(player.getName() + " rolled " + diceValues[0] + " + " + diceValues[1] + " = " + roll);
+
+    if (diceValues[0] == diceValues[1]) {
+      System.out.println(player.getName() + " rolled doubles and gets out of Jail!");
+      gameState.releaseFromJail(player);
+      player.setTurnsInJail(0);
+      player.move(roll, gameState.getBoard());
+      player.performTurnActions(gameState);
+    } else if (player.getTurnsInJail() >= 3) {
+      System.out.println(player.getName() + " has been in Jail for 3 turns and must pay $50 to get out.");
+      player.subtractMoney(50);
+      gameState.releaseFromJail(player);
+      player.setTurnsInJail(0);
+      player.move(roll, gameState.getBoard());
+      player.performTurnActions(gameState);
+    } else {
+      System.out.println(player.getName() + " stays in Jail.");
     }
   }
 }
