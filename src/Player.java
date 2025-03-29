@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a player in the Monopoly game.
@@ -12,6 +14,7 @@ public class Player {
     private int turnCounter;
     private String token;
     private List<Property> properties;
+    private List<Property> mortgagedProperties;
     private boolean hasGetOutOfJailFreeCard;
     private int turnsInJail;
     public Dice dice;  // Made public for easier access
@@ -28,6 +31,7 @@ public class Player {
         this.turnCounter = 0; // Number of turns the player has taken
         this.token = null; // Token starts as null
         this.properties = new ArrayList<>();
+        this.mortgagedProperties = new ArrayList<>();
         this.hasGetOutOfJailFreeCard = false;
         this.turnsInJail = 0;
         this.dice = new Dice();
@@ -190,6 +194,317 @@ public class Player {
     }
 
     /**
+     * Mortgages a property to get cash from the bank.
+     * The property must be owned by this player and not already mortgaged.
+     *
+     * @param property The property to mortgage
+     * @return true if successfully mortgaged, false otherwise
+     */
+    public boolean mortgageProperty(Property property) {
+        // Check if player owns the property
+        if (!properties.contains(property)) {
+            System.out.println(name + " does not own " + property.getName());
+            return false;
+        }
+
+        // Check if property is already mortgaged
+        if (mortgagedProperties.contains(property)) {
+            System.out.println(property.getName() + " is already mortgaged");
+            return false;
+        }
+
+        // Check if property has houses or hotels
+        if (property.getHouses() > 0 || property.hasHotel()) {
+            System.out.println("You must sell all houses and hotels on this property before mortgaging");
+            return false;
+        }
+
+        // Get mortgage value and add to player's money
+        int mortgageValue = property.getMortgageValue();
+        addMoney(mortgageValue);
+
+        // Update property status
+        property.setMortgaged(true);
+
+        // Add to mortgaged properties list
+        mortgagedProperties.add(property);
+
+        System.out.println(name + " mortgaged " + property.getName() + " for $" + mortgageValue);
+        return true;
+    }
+
+    /**
+     * Unmortgages a property by paying the unmortgage cost to the bank.
+     * The property must be owned by this player and currently mortgaged.
+     *
+     * @param property The property to unmortgage
+     * @return true if successfully unmortgaged, false otherwise
+     */
+    public boolean unmortgageProperty(Property property) {
+        // Check if player owns the property
+        if (!properties.contains(property)) {
+            System.out.println(name + " does not own " + property.getName());
+            return false;
+        }
+
+        // Check if property is mortgaged
+        if (!mortgagedProperties.contains(property)) {
+            System.out.println(property.getName() + " is not mortgaged");
+            return false;
+        }
+
+        // Get unmortgage cost (mortgage value plus 10% interest)
+        int unmortgageCost = property.getUnmortgageCost();
+
+        // Check if player has enough money
+        if (money < unmortgageCost) {
+            System.out.println(name + " does not have enough money to unmortgage " + property.getName());
+            return false;
+        }
+
+        // Subtract cost from player's money
+        subtractMoney(unmortgageCost);
+
+        // Update property status
+        property.setMortgaged(false);
+
+        // Remove from mortgaged properties list
+        mortgagedProperties.remove(property);
+
+        System.out.println(name + " unmortgaged " + property.getName() + " for $" + unmortgageCost);
+        return true;
+    }
+
+    /**
+     * Gets all mortgaged properties owned by this player.
+     *
+     * @return The list of mortgaged properties
+     */
+    public List<Property> getMortgagedProperties() {
+        return mortgagedProperties;
+    }
+
+    /**
+     * Checks if a property is mortgaged.
+     *
+     * @param property The property to check
+     * @return true if the property is mortgaged, false otherwise
+     */
+    public boolean isPropertyMortgaged(Property property) {
+        return mortgagedProperties.contains(property);
+    }
+
+    /**
+     * Gets all color groups that this player has a monopoly in.
+     *
+     * @param gameboard The game board
+     * @return A list of color groups where the player has a monopoly
+     */
+    public List<String> getMonopolies(Gameboard gameboard) {
+        List<String> monopolies = new ArrayList<>();
+
+        // Get all unique color groups from the player's properties
+        Set<String> colorGroups = new HashSet<>();
+        for (Property property : properties) {
+            colorGroups.add(property.getColorGroup());
+        }
+
+        // Check each color group to see if the player owns all properties in it
+        for (String colorGroup : colorGroups) {
+            if (gameboard.playerOwnsAllInColorGroup(this, colorGroup)) {
+                monopolies.add(colorGroup);
+            }
+        }
+
+        return monopolies;
+    }
+
+    /**
+     * Buys a house for a property if possible.
+     *
+     * @param property The property to buy a house for
+     * @param gameboard The game board
+     * @param bank The bank
+     * @return true if the house was bought, false otherwise
+     */
+    public boolean buyHouse(Property property, Gameboard gameboard, Bank bank) {
+        // Check if the player owns the property
+        if (!properties.contains(property)) {
+            System.out.println("You don't own " + property.getName());
+            return false;
+        }
+
+        // Check if the property is part of a monopoly
+        if (!gameboard.playerOwnsAllInColorGroup(this, property.getColorGroup())) {
+            System.out.println("You must own all properties in the " + property.getColorGroup() + " color group to buy houses");
+            return false;
+        }
+
+        // Check if the property is mortgaged
+        if (property.isMortgaged()) {
+            System.out.println("You cannot buy houses for a mortgaged property");
+            return false;
+        }
+
+        // Check if the property already has a hotel
+        if (property.hasHotel()) {
+            System.out.println(property.getName() + " already has a hotel");
+            return false;
+        }
+
+        // Check if houses will be evenly distributed
+        List<Property> propertiesInGroup = gameboard.getPropertiesByColorGroup(property.getColorGroup());
+        if (!willHousesBeEvenlyDistributed(propertiesInGroup, property)) {
+            System.out.println("Houses must be evenly distributed across properties in a color group");
+            return false;
+        }
+
+        // Calculate house cost
+        int houseCost = Houses.getHousePrice(property.getColorGroup());
+
+        // Check if player has enough money
+        if (money < houseCost) {
+            System.out.println("You don't have enough money to buy a house for " + property.getName());
+            return false;
+        }
+
+        // Check if bank has houses available
+        if (bank.getHouses() <= 0) {
+            System.out.println("The bank has no houses left");
+            return false;
+        }
+
+        // Buy the house
+        subtractMoney(houseCost);
+        property.addHouse();
+
+        System.out.println(name + " bought a house for " + property.getName() + " for $" + houseCost);
+        return true;
+    }
+
+    /**
+     * Buys a hotel for a property if possible.
+     *
+     * @param property The property to buy a hotel for
+     * @param gameboard The game board
+     * @param bank The bank
+     * @return true if the hotel was bought, false otherwise
+     */
+    public boolean buyHotel(Property property, Gameboard gameboard, Bank bank) {
+        // Check if the player owns the property
+        if (!properties.contains(property)) {
+            System.out.println("You don't own " + property.getName());
+            return false;
+        }
+
+        // Check if the property is part of a monopoly
+        if (!gameboard.playerOwnsAllInColorGroup(this, property.getColorGroup())) {
+            System.out.println("You must own all properties in the " + property.getColorGroup() + " color group to buy a hotel");
+            return false;
+        }
+
+        // Check if the property is mortgaged
+        if (property.isMortgaged()) {
+            System.out.println("You cannot buy a hotel for a mortgaged property");
+            return false;
+        }
+
+        // Check if the property already has 4 houses
+        if (property.getHouses() != 4) {
+            System.out.println(property.getName() + " must have 4 houses before you can buy a hotel");
+            return false;
+        }
+
+        // Calculate hotel cost
+        int hotelCost = Houses.getHousePrice(property.getColorGroup());
+
+        // Check if player has enough money
+        if (money < hotelCost) {
+            System.out.println("You don't have enough money to buy a hotel for " + property.getName());
+            return false;
+        }
+
+        // Check if bank has hotels available
+        if (bank.getHotels() <= 0) {
+            System.out.println("The bank has no hotels left");
+            return false;
+        }
+
+        // Buy the hotel
+        subtractMoney(hotelCost);
+        property.addHouse(); // This will convert 4 houses to a hotel in the Property class
+
+        System.out.println(name + " bought a hotel for " + property.getName() + " for $" + hotelCost);
+        return true;
+    }
+
+    /**
+     * Checks if adding a house to a property will maintain even distribution across all properties in the color group.
+     *
+     * @param propertiesInGroup All properties in the color group
+     * @param property The property getting a new house
+     * @return true if houses will be evenly distributed, false otherwise
+     */
+    private boolean willHousesBeEvenlyDistributed(List<Property> propertiesInGroup, Property property) {
+        int currentHouses = property.getHouses();
+        int newHouses = currentHouses + 1;
+
+        for (Property p : propertiesInGroup) {
+            if (p != property) {
+                int diff = newHouses - p.getHouses();
+                if (diff > 1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Sells a house from a property back to the bank.
+     *
+     * @param property The property to sell a house from
+     * @param bank The bank
+     * @return true if the house was sold, false otherwise
+     */
+    public boolean sellHouse(Property property, Bank bank) {
+        // Check if the player owns the property
+        if (!properties.contains(property)) {
+            System.out.println("You don't own " + property.getName());
+            return false;
+        }
+
+        // Check if the property has houses
+        if (property.getHouses() == 0 && !property.hasHotel()) {
+            System.out.println(property.getName() + " has no houses to sell");
+            return false;
+        }
+
+        // Calculate house value (half of purchase price)
+        int housePrice = Houses.getHousePrice(property.getColorGroup());
+        int sellValue = housePrice / 2;
+
+        // Sell the house
+        if (property.hasHotel()) {
+            // If there's a hotel, convert it back to 4 houses first
+            property.setHasHotel(false);
+            property.setHouses(4);
+
+            // Then sell one house
+            property.removeHouse();
+        } else {
+            property.removeHouse();
+        }
+
+        // Add money to player
+        addMoney(sellValue);
+
+        System.out.println(name + " sold a house from " + property.getName() + " for $" + sellValue);
+        return true;
+    }
+
+    /**
      * Determines if the player should go to jail based on dice rolls.
      *
      * @return true if the player should go to jail, false otherwise
@@ -257,9 +572,8 @@ public class Player {
         // Move the player
         move(roll, gameboard);
 
-        // Land on space and handle its effect
-        Space currentSpace = gameboard.getspace(position);
-        handleLandingOnSpace(currentSpace, gameState);
+        // Perform actions based on the space landed on
+        performTurnActions(gameState);
 
         // If player rolled doubles, they get another turn (unless they're in jail)
         if (dice.getDie1Value() == dice.getDie2Value() && !gameState.isPlayerInJail(this)) {
@@ -290,8 +604,7 @@ public class Player {
             move(roll, gameState.getBoard());
 
             // Handle the new space
-            Space currentSpace = gameState.getBoard().getspace(position);
-            handleLandingOnSpace(currentSpace, gameState);
+            performTurnActions(gameState);
             return;
         }
 
@@ -308,8 +621,7 @@ public class Player {
             move(roll, gameState.getBoard());
 
             // Handle the new space
-            Space currentSpace = gameState.getBoard().getspace(position);
-            handleLandingOnSpace(currentSpace, gameState);
+            performTurnActions(gameState);
             return;
         }
 
@@ -324,8 +636,7 @@ public class Player {
             move(roll, gameState.getBoard());
 
             // Handle the new space
-            Space currentSpace = gameState.getBoard().getspace(position);
-            handleLandingOnSpace(currentSpace, gameState);
+            performTurnActions(gameState);
         } else if (turnsInJail >= 3) {
             // After 3 turns, player must pay and get out
             System.out.println(name + " has been in Jail for 3 turns and must pay $50 to get out.");
@@ -335,104 +646,57 @@ public class Player {
             move(roll, gameState.getBoard());
 
             // Handle the new space
-            Space currentSpace = gameState.getBoard().getspace(position);
-            handleLandingOnSpace(currentSpace, gameState);
+            performTurnActions(gameState);
         } else {
             System.out.println(name + " stays in Jail.");
         }
     }
 
     /**
-     * Handles landing on different types of spaces.
+     * Performs dynamic turn steps based on where the player landed.
+     * This method should be called after the player has moved to a new position.
      *
-     * @param space The space the player landed on
      * @param gameState The current game state
      */
-    private void handleLandingOnSpace(Space space, GameState gameState) {
-        System.out.println(name + " landed on " + space.getName());
+    public void performTurnActions(GameState gameState) {
+        Space currentSpace = gameState.getBoard().getspace(position);
 
-        if (space instanceof Property) {
-            handlePropertySpace((Property) space);
-        } else if (space instanceof RailroadSpace) {
-            RailroadSpace railroad = (RailroadSpace) space;
+        // Different actions based on space type
+        if (currentSpace instanceof Property) {
+            Property property = (Property) currentSpace;
+            property.onLand(this, gameState);
+        } else if (currentSpace instanceof RailroadSpace) {
+            RailroadSpace railroad = (RailroadSpace) currentSpace;
             railroad.onLand(this, gameState);
-        } else if (space instanceof SpecialSpace) {
-            handleSpecialSpace((SpecialSpace) space, gameState);
-        }
-    }
+        } else if (currentSpace instanceof UtilitySpace) {
+            UtilitySpace utility = (UtilitySpace) currentSpace;
+            utility.onLand(this, gameState);
+        } else if (currentSpace instanceof GoSpace) {
+            GoSpace goSpace = (GoSpace) currentSpace;
+            goSpace.onLand(this, gameState);
+        } else if (currentSpace instanceof JailSpace) {
+            JailSpace jailSpace = (JailSpace) currentSpace;
+            jailSpace.onLand(this, gameState);
+        } else if (currentSpace instanceof FreeParkingSpace) {
+            FreeParkingSpace freeParkingSpace = (FreeParkingSpace) currentSpace;
+            freeParkingSpace.onLand(this, gameState);
+        } else if (currentSpace instanceof SpecialSpace) {
+            SpecialSpace specialSpace = (SpecialSpace) currentSpace;
 
-    /**
-     * Handles landing on a property space.
-     *
-     * @param property The property landed on
-     */
-    private void handlePropertySpace(Property property) {
-        if (property.isOwned()) {
-            if (property.getOwner() != this) {
-                int rent = property.getRent();
-                System.out.println(name + " must pay $" + rent + " rent to " + property.getOwner().getName());
-                payRent(property.getOwner(), rent);
-            } else {
-                System.out.println(name + " owns this property.");
-            }
-        } else {
-            System.out.println("Property is unowned and costs $" + property.getPrice());
-            // Automatic buying for now - in a full game, you'd ask the player
-            if (money >= property.getPrice()) {
-                buyProperty(property);
-            }
-        }
-    }
-
-    /**
-     * Handles landing on a special space.
-     *
-     * @param specialSpace The special space landed on
-     * @param gameState The current game state
-     */
-    private void handleSpecialSpace(SpecialSpace specialSpace, GameState gameState) {
-        switch (specialSpace.getType()) {
-            case "Start":
-                // Player landed directly on Go
-                addMoney(200);
-                System.out.println(name + " landed on Go and collects $200.");
-                break;
-            case "Tax":
-                int taxAmount = specialSpace.getName().equals("Luxury Tax") ? 100 : 200;
-                System.out.println(name + " pays $" + taxAmount + " in taxes.");
-                subtractMoney(taxAmount);
-                break;
-            case "Chance":
+            if (specialSpace.getType().equals("Chance")) {
                 String chanceCard = gameState.drawChanceCard();
                 System.out.println(name + " drew a Chance card: " + chanceCard);
                 handleCardEffect(chanceCard, gameState);
-                break;
-            case "Community Chest":
+            } else if (specialSpace.getType().equals("Community Chest")) {
                 String communityCard = gameState.drawCommunityChestCard();
                 System.out.println(name + " drew a Community Chest card: " + communityCard);
                 handleCardEffect(communityCard, gameState);
-                break;
-            case "Free Parking":
-                System.out.println(name + " landed on Free Parking. Nothing happens.");
-                break;
-            case "Go To Jail":
+            } else if (specialSpace.getType().equals("Go To Jail")) {
                 System.out.println(name + " landed on Go To Jail!");
                 JailSpace.goToJail(this, gameState);
-                break;
-            case "Jail":
-                System.out.println(name + " is just visiting Jail.");
-                break;
-            case "Utility":
-                // Basic implementation for utilities
-                System.out.println(name + " landed on " + specialSpace.getName() + ". Utilities not fully implemented.");
-                break;
-            case "Railroad":
-                // This shouldn't happen if RailroadSpace is implemented correctly
-                System.out.println(name + " landed on " + specialSpace.getName() + ". Railroads should be handled separately.");
-                break;
-            default:
-                System.out.println(name + " landed on " + specialSpace.getName());
-                break;
+            } else if (specialSpace.getType().equals("Tax")) {
+                handleTaxSpace(specialSpace, gameState);
+            }
         }
     }
 
@@ -484,6 +748,24 @@ public class Player {
             }
         }
         // More complex card effects would need more detailed implementations
+    }
+
+    /**
+     * Handles landing on a tax space.
+     *
+     * @param taxSpace The tax space landed on
+     * @param gameState The current game state
+     */
+    private void handleTaxSpace(SpecialSpace taxSpace, GameState gameState) {
+        int taxAmount = 0;
+        if (taxSpace.getName().equals("Income Tax")) {
+            taxAmount = 200;
+        } else if (taxSpace.getName().equals("Luxury Tax")) {
+            taxAmount = 100;
+        }
+
+        System.out.println(name + " must pay $" + taxAmount + " in taxes");
+        subtractMoney(taxAmount);
     }
 
     /**
@@ -558,6 +840,7 @@ public class Player {
     @Override
     public String toString() {
         return name + " ($" + money + ", Position: " + position +
-                ", Token: " + token + ", Properties: " + properties.size() + ")";
+                ", Token: " + token + ", Properties: " + properties.size() +
+                ", Mortgaged: " + mortgagedProperties.size() + ")";
     }
 }
