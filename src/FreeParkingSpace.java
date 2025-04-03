@@ -1,12 +1,13 @@
 /**
  * this class represents the Free Parking space in Monopoly.
  * It extends the SpecialSpace class and implements the onLand method.
+ * Author: Marena Abboud
  */
 public class FreeParkingSpace extends SpecialSpace {
     private int moneyPool; // Optional: for house rule where money from fines goes to Free Parking
 
     /**
-     * @author: Marena
+     * @author: Marena Abboud
      * Constructs a Free Parking space.
      * In standard Monopoly, landing on Free Parking has no effect.
      */
@@ -16,6 +17,7 @@ public class FreeParkingSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena Abboud
      * Handles a player landing on the Free Parking space.
      * By default, nothing happens in standard rules.
      * But a common house rule is that the player collects any money in the pot.
@@ -35,6 +37,7 @@ public class FreeParkingSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena Abboud
      * Adds money to the Free Parking pool.
      * This would be used with house rules that put fines and taxes into the pot.
      *
@@ -45,6 +48,7 @@ public class FreeParkingSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena Abboud
      * Gets the current amount of money in the Free Parking pool.
      *
      * @return The amount of money in the pool
@@ -54,6 +58,7 @@ public class FreeParkingSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena Abboud
      * Default version of onLand that uses standard rules (no money collection).
      *
      * @param player The player who landed on Free Parking
@@ -62,6 +67,11 @@ public class FreeParkingSpace extends SpecialSpace {
     public void onLand(Player player, GameState gameState) {
         onLand(player, gameState, false);
     }
+
+    /**
+     * Author: Marena Abboud
+     * This method is called when a player lands on a special space.
+     */
 
     @Override
     public void playerOnSpecialSpace() {
