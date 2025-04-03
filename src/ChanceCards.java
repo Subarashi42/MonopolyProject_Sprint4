@@ -1,34 +1,63 @@
+/**
+ * @author Team 4
+ * this class represents the Chance Cards in the game of Monopoly.
+ * It implements the ChestAndCardSpot interface.
+ * The class has a Map of Chance Cards. And is responsible for shuffling the cards.
+ */
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 
-/*
+/**
+    * Author: Tati Curtis
     * This class represents the Chance Cards in the game of Monopoly.
     * The class implements the ChestAndCardSpot interface.
     * The class has a Map of Chance Cards. And is responsible for shuffling the cards.
- */
+ **/
 
 public class ChanceCards implements ChestAndCardSpot {
-
+    /**
+     * Author: Tati Curtis
+     * This is a map of the Chance Cards.
+     * The key is the card name and the value is the card description.
+     */
     private static Map<String, String> chanceCards;
-
+     /**
+     *  Author: Tati Curtis
+     * This is the constructor for the ChanceCards class.
+     * It initializes the chanceCards map.
+     */
     public ChanceCards()
     {
         this.chanceCards = new HashMap<>();
     }
 
+    /**
+     * Author: Tati Curtis
+     * This method is used to shuffle the cards.
+     */
     public Map<String, String> getChanceCards()
     {
         return this.chanceCards;
     }
+    /** Author: Tati Curtis
+     * This method is used to set the chanceCards map.
+     * @param chanceCards The chanceCards map to set.
+     */
 
     public void setChanceCards(Map<String, String> chanceCards)
     {
         this.chanceCards = chanceCards;
     }
 
+    /**
+     * Author: Tati Curtis
+     * This method is used to create the chance cards.
+     * It initializes the chanceCards map with the card name and description.
+     * @see ChanceCards
+     */
     public void cards() {
         chanceCards.put("Card1", "Take a ride on the Reading Railroad. If you pass Go, collect $200.");
         chanceCards.put("Card2", "Advance Token to Nearest Railroad and Pay Owner Twice the Rental to Which He is Otherwise Entitled. If Railroad is Unowned, You May Buy it from the Bank.");
@@ -47,7 +76,12 @@ public class ChanceCards implements ChestAndCardSpot {
         chanceCards.put("Card15", "Your Building Loan Matures. Collect $150.");
         chanceCards.put("Card16", "Advance Token to Nearest Railroad and Pay Owner Twice the Rental to Which He is Otherwise Entitled. If Railroad is Unowned, You May Buy it from the Bank.");
     }
-
+    /** Author: Tati Curtis
+     * Edited by: Aiden Clare
+     * This method is used to shuffle the cards.
+     * It returns a random card from the chanceCards map.
+     * @return A random card from the chanceCards map.
+     */
     public static String shuffleCards() {
         Random rand = new Random();
         List<String> cards = new ArrayList<>(chanceCards.keySet());
@@ -56,6 +90,10 @@ public class ChanceCards implements ChestAndCardSpot {
         return chanceCards.get(randomCard);
     }
 
+    /**
+     * Author: Aiden Clare
+     * This method is used to draw a card from the chanceCards map.
+     */
     public static void drawCard(Player player1) {
         System.out.println("Player " + player1.getName() + " drew a Chance card: " + shuffleCards());
     }

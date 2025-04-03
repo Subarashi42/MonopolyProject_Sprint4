@@ -7,6 +7,7 @@ public class Hotels {
     private int availableHotels;
 
     /**
+     * Author: Marena
      * Constructs a new Hotels object with the default number of hotels.
      */
     public Hotels() {
@@ -14,6 +15,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Gets the number of hotels currently available.
      *
      * @return The number of available hotels
@@ -23,6 +25,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Attempts to use a hotel for building.
      *
      * @return true if a hotel was successfully allocated, false if there are none left
@@ -36,6 +39,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Returns a hotel to the bank when it is removed from a property.
      */
     public void returnHotel() {
@@ -45,6 +49,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Checks if hotels are available.
      *
      * @return true if at least one hotel is available, false otherwise
@@ -54,6 +59,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Resets the hotels to the initial count (for starting a new game).
      */
     public void reset() {
@@ -61,6 +67,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Gets the price for building a hotel on a property.
      * This is the same as a house price, since a hotel costs the same as a house
      * and replaces 4 houses.
@@ -73,6 +80,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Gets the number of houses that are returned to the bank when upgrading to a hotel.
      * In standard Monopoly, you exchange 4 houses for 1 hotel.
      *
@@ -83,6 +91,7 @@ public class Hotels {
     }
 
     /**
+     * Author: Marena
      * Returns a string representation of the hotels.
      *
      * @return A string with information about available hotels

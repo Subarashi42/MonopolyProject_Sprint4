@@ -1,7 +1,13 @@
+/**
+ * JailSpace.java
+ * this class represents the Jail space in the game of Monopoly.
+ * It extends the SpecialSpace class.
+ */
 public class JailSpace extends SpecialSpace {
     private static final int JAIL_FEE = 50;
 
     /**
+     * Author: Marena
      * Constructs a Jail space on the Monopoly board.
      */
     public JailSpace() {
@@ -9,6 +15,7 @@ public class JailSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Handles a player landing on the Jail space when they're "Just Visiting".
      *
      * @param player The player who landed on Jail
@@ -22,6 +29,7 @@ public class JailSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Sends a player to Jail.
      * This method updates the player's position and the game state to reflect that they're in jail.
      *
@@ -35,6 +43,7 @@ public class JailSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Allows a player to get out of jail by paying the fine.
      *
      * @param player The player who wants to pay to get out of jail
@@ -55,6 +64,7 @@ public class JailSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Tries to get the player out of jail by rolling doubles.
      *
      * @param player The player trying to get out of jail
@@ -84,6 +94,7 @@ public class JailSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Uses a "Get Out of Jail Free" card if the player has one.
      * Implementation would depend on how cards are tracked in your game.
      *
@@ -104,6 +115,11 @@ public class JailSpace extends SpecialSpace {
         }
         return false;
     }
+
+    /**
+     * Author: Marena
+     * Handles a player landing on the Jail space.
+     */
 
     @Override
     public void playerOnSpecialSpace() {

@@ -1,9 +1,17 @@
+/**
+ * Monopoly Gameboard Class
+ * This class represents the gameboard for the Monopoly game.
+ * It contains a list of spaces that represent the different spaces on the board.
+ * Each space can be a property, special space, railroad, or utility.
+ */
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Author: Aiden Clare
+ * Edited by Marena
  * Represents the gameboard for the Monopoly game.
  * Contains a list of spaces that represent the different spaces on the board.
  */
@@ -12,6 +20,8 @@ public class Gameboard {
     private Map<Integer, String> propertyOwnership;
 
     /**
+     * Author: Aiden Clare
+     * Edited by Tati Curtis
      * Constructs a new gameboard with all spaces initialized.
      */
     public Gameboard() {
@@ -21,6 +31,8 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
+     * Edited by Marena
      * Initializes all spaces on the board.
      */
     private void initializeBoard() {
@@ -68,6 +80,8 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
+     * Edited by Marena
      * Gets a space at a specific position on the board.
      *
      * @param position The position of the space
@@ -81,6 +95,8 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
+     * Edited by Tati Curtis
      * Prints all spaces on the board.
      */
     public void printBoard() {
@@ -90,6 +106,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets all spaces on the board.
      *
      * @return The list of all spaces
@@ -99,6 +116,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
      * Sets the list of spaces on the board.
      *
      * @param spaces The new list of spaces
@@ -108,6 +126,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the property ownership map.
      *
      * @return The property ownership map
@@ -117,6 +136,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
      * Sets the property ownership map.
      *
      * @param propertyOwnership The new property ownership map
@@ -126,6 +146,8 @@ public class Gameboard {
     }
 
     /**
+     * Author: Aiden Clare
+     * Edited by Marena
      * Gets all properties of a specific color group.
      *
      * @param colorGroup The color group to search for
@@ -147,6 +169,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Marena
      * Gets all railroads on the board.
      *
      * @return A list of all railroad spaces
@@ -164,6 +187,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Marena
      * Gets all utilities on the board.
      *
      * @return A list of all utility spaces
@@ -181,6 +205,7 @@ public class Gameboard {
     }
 
     /**
+     * Author: Marena
      * Checks if a player owns all properties in a color group.
      *
      * @param player The player to check

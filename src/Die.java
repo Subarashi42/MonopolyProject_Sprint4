@@ -1,25 +1,44 @@
-/* Purpose: The die class represents a 6 Sided Die. Returns a random number between 1 and 6 inclusive.
+/** Purpose: The die class represents a 6 Sided Die. Returns a random number between 1 and 6 inclusive.
 * Author: Tati Curtis
 * */
 import java.util.Random;
 
-// Represents a standard 6 sided die
+/**
+ * Author : Tati Curtis
+ * This class represents a die with a specified number of sides.
+ * It can roll the die and return the value of the last roll.
+ */
 public class Die {
     private int numberOfSides;
     private Random random;
     private int lastRollValue;
 
-    // Constructs a 6 sided die with a random number generator
+    /**
+     * Author : Tati Curtis
+     * This is the constructor for the Die class.
+     * It initializes the number of sides and the random number generator.
+     * @param numberOfSides
+     */
     public Die(int numberOfSides) {
         this.numberOfSides = numberOfSides;
         this.random = new Random();
     }
-    // Rolls the die and stores the result
+
+    /**
+     * Author : Tati Curtis
+     * This method is used to roll the die.
+     * It generates a random number between 1 and the number of sides.
+     * @return
+     */
     public int roll(){
         lastRollValue = random.nextInt(numberOfSides) + 1;
         return lastRollValue;
     }
-    // Returns the value of the last roll
+    /**
+     * Author : Tati Curtis
+     * This method is used to get the value of the last roll.
+     * @return
+     */
     public int getDieValue() {
         return lastRollValue;
     }

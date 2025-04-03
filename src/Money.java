@@ -22,6 +22,7 @@ public class Money {
     public static final int JAIL_FEE = 50;
 
     /**
+     * Author: Marena
      * Calculates the optimal distribution of bills for a given amount.
      *
      * @param amount The amount to distribute
@@ -56,6 +57,7 @@ public class Money {
     }
 
     /**
+     * Author: Marena
      * Formats the bill distribution into a readable string.
      *
      * @param distribution An array with counts of each denomination
@@ -96,6 +98,7 @@ public class Money {
     }
 
     /**
+     * Author: Marena
      * Gets the standard starting money for a player.
      *
      * @return The starting money amount
@@ -105,6 +108,7 @@ public class Money {
     }
 
     /**
+     * Author: Marena
      * Prints the details of a money transaction.
      *
      * @param amount The amount of money transferred
@@ -118,6 +122,7 @@ public class Money {
     }
 
     /**
+     * Author: Marena
      * Calculates the total value of a bill distribution.
      *
      * @param distribution An array with counts of each denomination

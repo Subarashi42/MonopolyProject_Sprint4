@@ -1,8 +1,16 @@
+/**
+ * Monopoly Game
+ * This is a simple implementation of the Monopoly game.
+ * It includes basic game mechanics such as rolling dice, moving players, buying properties, and handling jail.
+ * and of course, demonstration of the game.
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /**
+ * Author: Team 4
  * Main class to run the Monopoly game.
  */
 public class Main {
@@ -39,6 +47,8 @@ public class Main {
   }
 
   /**
+   * Author: Aiden Clare
+   * Edited by Marena
    * Creates players for the game.
    *
    * @return A list of players
@@ -73,6 +83,8 @@ public class Main {
   }
 
   /**
+   * Author: Aiden Clare
+   * Edited by Marena
    * Assigns tokens to players.
    *
    * @param players The list of players
@@ -99,6 +111,7 @@ public class Main {
   }
 
   /**
+   * Author: Marena
    * Main game loop.
    *
    * @param gameState The game state
@@ -143,6 +156,7 @@ public class Main {
   }
 
   /**
+   * Author: Marena
    * Handles a player's turn with the dynamic turn system.
    *
    * @param player The player taking a turn
@@ -203,6 +217,7 @@ public class Main {
   }
 
   /**
+   * Author: Marena
    * Announces the winner of the game.
    *
    * @param players The list of remaining players
@@ -232,6 +247,8 @@ public class Main {
   }
 
   /**
+   * Author: Aiden Clare
+   * Edited by Marena
    * Calculates a player's total value (money + property values).
    *
    * @param player The player
@@ -255,6 +272,7 @@ public class Main {
   }
 
   /**
+   * Author: Marena
    * Handles a player's turn when they are in jail.
    *
    * @param player The player in jail
@@ -330,6 +348,7 @@ public class Main {
   }
 
   /**
+   * Author: Marena
    * Helper method to handle the "roll for doubles" jail option.
    *
    * @param player The player in jail

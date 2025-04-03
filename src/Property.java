@@ -12,6 +12,7 @@ public class Property extends Space {
     private TitleDeedCard titleDeed;
 
     /**
+     * Author: Marena
      * Constructs a new property on the Monopoly board with a title deed card.
      *
      * @param name The name of the property
@@ -75,6 +76,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Sets the owner of the property.
      *
      * @param owner The player who owns the property
@@ -85,6 +87,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the owner of the property.
      *
      * @return The owner of the property
@@ -95,6 +98,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the title deed card for this property.
      *
      * @return The title deed card
@@ -104,6 +108,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the name of the property.
      *
      * @return The name of the property
@@ -114,6 +119,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the price of the property.
      *
      * @return The price of the property
@@ -123,6 +129,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the color group of the property.
      *
      * @return The color group of the property
@@ -132,6 +139,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Adds a house to the property if possible.
      *
      * @return True if a house was added, false otherwise
@@ -151,6 +159,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Removes a house from the property if possible.
      *
      * @return True if a house was removed, false otherwise
@@ -170,6 +179,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Checks if the property is owned.
      *
      * @return True if the property is owned, false otherwise
@@ -179,6 +189,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Checks if the property is mortgaged.
      *
      * @return True if the property is mortgaged, false otherwise
@@ -198,6 +209,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Handles what happens when a player lands on this property.
      *
      * @param player The player who landed on the property
@@ -241,6 +253,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Prompt the player to buy the property.
      * This is a placeholder for a real UI interaction.
      *
@@ -254,6 +267,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Calculates the rent based on houses, hotels, and monopoly ownership.
      *
      * @param gameState The current game state
@@ -277,6 +291,11 @@ public class Property extends Space {
         }
     }
 
+    /**
+     * Author: Marena
+     * Returns a string representation of the property.
+     * @return
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -291,6 +310,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Checks if the property has a hotel.
      *
      * @return True if the property has a hotel, false otherwise
@@ -300,6 +320,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the number of houses on the property.
      *
      * @return The number of houses
@@ -309,6 +330,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Sets the number of houses on the property.
      *
      * @param houses The new number of houses
@@ -318,6 +340,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the base rent of the property.
      *
      * @return The base rent
@@ -327,6 +350,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Sets whether the property has a hotel.
      *
      * @param hasHotel True if the property should have a hotel, false otherwise
@@ -336,6 +360,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the mortgage value of the property.
      *
      * @return The mortgage value (half the purchase price)
@@ -345,6 +370,7 @@ public class Property extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the cost to unmortgage the property.
      *
      * @return The unmortgage cost (mortgage value plus 10% interest)
@@ -352,6 +378,11 @@ public class Property extends Space {
     public int getUnmortgageCost() {
         return titleDeed.getUnmortgageCost();
     }
+
+    /**
+     * Author: Marena
+     * Checks if the property is a utility.
+     */
 
     @Override
     public void playerOnProperty() {

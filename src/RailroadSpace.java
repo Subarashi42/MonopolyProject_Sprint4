@@ -1,3 +1,9 @@
+/**
+ * RailroadSpace.java
+ * this class represents a railroad space on the Monopoly board.
+ * It extends the Space class.
+ */
+
 import java.util.List;
 
 public class RailroadSpace extends Space {
@@ -6,6 +12,7 @@ public class RailroadSpace extends Space {
     private final int BASE_RENT = 25;
 
     /**
+     * Author: Marena
      * Constructs a railroad space on the Monopoly board.
      *
      * @param name     The name of the railroad
@@ -18,6 +25,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the price of the railroad.
      *
      * @return The price of the railroad
@@ -27,6 +35,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Aiden Clare
      * Sets the owner of the railroad.
      *
      * @param owner The player who owns the railroad
@@ -36,6 +45,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the owner of the railroad.
      *
      * @return The owner of the railroad
@@ -45,6 +55,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Checks if the railroad is owned.
      *
      * @return True if the railroad is owned, false otherwise
@@ -54,6 +65,8 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Aiden Clare
+     * Edited by Marena
      * Calculates the rent based on how many railroads the owner has.
      * The rent doubles for each railroad owned.
      *
@@ -91,6 +104,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Handles what happens when a player lands on this railroad.
      *
      * @param player    The player who landed on the railroad
@@ -111,6 +125,11 @@ public class RailroadSpace extends Space {
         }
     }
 
+    /**
+     * Author: Marena
+     * Returns a string representation of the railroad space.
+     * @return
+     */
     @Override
     public String toString() {
         return super.toString() + " - Price: $" + price + ", Owner: " +
@@ -118,6 +137,7 @@ public class RailroadSpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Override the playerOnRailroad method from Space class
      */
     @Override

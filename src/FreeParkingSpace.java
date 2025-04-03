@@ -1,7 +1,12 @@
+/**
+ * this class represents the Free Parking space in Monopoly.
+ * It extends the SpecialSpace class and implements the onLand method.
+ */
 public class FreeParkingSpace extends SpecialSpace {
     private int moneyPool; // Optional: for house rule where money from fines goes to Free Parking
 
     /**
+     * @author: Marena
      * Constructs a Free Parking space.
      * In standard Monopoly, landing on Free Parking has no effect.
      */

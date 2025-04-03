@@ -13,6 +13,7 @@ public class Houses {
     private static final int GREEN_DARK_BLUE_PRICE = 200;
 
     /**
+     * Author: Marena
      * Constructs a new Houses object with the default number of houses.
      */
     public Houses() {
@@ -20,6 +21,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Gets the number of houses currently available.
      *
      * @return The number of available houses
@@ -29,6 +31,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Attempts to use a number of houses for building.
      *
      * @param count The number of houses needed
@@ -43,6 +46,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Returns houses to the bank when they are removed from properties.
      *
      * @param count The number of houses to return
@@ -55,6 +59,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Resets the houses to the initial count (for starting a new game).
      */
     public void reset() {
@@ -62,6 +67,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Gets the price for building a house on a property based on its color group.
      *
      * @param colorGroup The color group of the property
@@ -87,6 +93,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Checks if there's a house shortage (less than 4 houses available).
      *
      * @return true if there's a house shortage, false otherwise
@@ -96,6 +103,7 @@ public class Houses {
     }
 
     /**
+     * Author: Marena
      * Returns a string representation of the houses.
      *
      * @return A string with information about available houses

@@ -14,6 +14,7 @@ public class TitleDeedCard {
     private boolean isMortgaged;
 
     /**
+     * Author: Marena
      * Constructs a new Title Deed Card for a property.
      *
      * @param propertyName The name of the property
@@ -38,6 +39,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the property name.
      *
      * @return The property name
@@ -47,6 +49,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the color group.
      *
      * @return The color group
@@ -56,6 +59,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the property price.
      *
      * @return The property price
@@ -65,6 +69,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the base rent (with no houses).
      *
      * @return The base rent
@@ -74,6 +79,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the rent with a specific number of houses.
      *
      * @param houses The number of houses (1-4)
@@ -87,6 +93,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the rent with a hotel.
      *
      * @return The hotel rent
@@ -96,6 +103,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the mortgage value.
      *
      * @return The mortgage value
@@ -105,6 +113,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the cost to build a house.
      *
      * @return The house cost
@@ -114,6 +123,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the cost to build a hotel.
      *
      * @return The hotel cost (same as house cost)
@@ -123,6 +133,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Checks if the property is mortgaged.
      *
      * @return true if mortgaged, false otherwise
@@ -132,6 +143,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Sets the mortgage status of the property.
      *
      * @param mortgaged The new mortgage status
@@ -141,6 +153,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Gets the cost to unmortgage the property.
      *
      * @return The unmortgage cost (mortgage value plus 10% interest)
@@ -150,6 +163,7 @@ public class TitleDeedCard {
     }
 
     /**
+     * Author: Marena
      * Returns a string representation of the title deed card.
      *
      * @return A formatted string with property details

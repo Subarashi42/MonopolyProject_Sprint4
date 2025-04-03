@@ -1,4 +1,5 @@
 /**
+ * Author: Marena
  * Represents the Go space on the Monopoly board.
  * Players collect $200 when landing on or passing this space.
  */
@@ -6,6 +7,7 @@ public class GoSpace extends SpecialSpace {
     private static final int GO_AMOUNT = 200;
 
     /**
+     * Author: Marena
      * Constructs a Go space, which is the starting space on the Monopoly board.
      */
     public GoSpace() {
@@ -13,6 +15,7 @@ public class GoSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Handles a player landing directly on the Go space.
      * Players collect $200 when landing on Go.
      *
@@ -25,6 +28,7 @@ public class GoSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Handles a player passing the Go space (not landing on it).
      * This method is called when a player's move causes them to pass Go.
      *
@@ -37,6 +41,7 @@ public class GoSpace extends SpecialSpace {
     }
 
     /**
+     * Author: Marena
      * Handles moving a player to the Go space, typically due to a card or special rule.
      * The player collects $200 in this case.
      *
@@ -49,6 +54,10 @@ public class GoSpace extends SpecialSpace {
         player.addMoney(GO_AMOUNT);
     }
 
+    /**
+     * Author: Marena
+     * Handles a player landing on the Go space.
+     */
     @Override
     public void playerOnSpecialSpace() {
         System.out.println("Player landed on Go and collects $" + GO_AMOUNT);

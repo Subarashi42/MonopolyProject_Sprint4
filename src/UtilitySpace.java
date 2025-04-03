@@ -9,6 +9,7 @@ public class UtilitySpace extends Space {
     private static final int PRICE = 150; // Standard price for utilities in Monopoly
 
     /**
+     * Author: Marena
      * Constructs a utility space on the Monopoly board.
      *
      * @param name The name of the utility (Electric Company or Water Works)
@@ -21,6 +22,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the price of the utility.
      *
      * @return The price of the utility
@@ -30,6 +32,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Sets the owner of the utility.
      *
      * @param owner The player who owns the utility
@@ -39,6 +42,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Gets the owner of the utility.
      *
      * @return The owner of the utility
@@ -48,6 +52,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Checks if the utility is owned.
      *
      * @return True if the utility is owned, false otherwise
@@ -57,6 +62,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Calculates the rent based on the dice roll and how many utilities the owner has.
      * If the owner has 1 utility, the rent is 4 times the dice roll.
      * If the owner has 2 utilities, the rent is 10 times the dice roll.
@@ -92,6 +98,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Handles what happens when a player lands on this utility.
      *
      * @param player The player who landed on the utility
@@ -125,6 +132,7 @@ public class UtilitySpace extends Space {
     }
 
     /**
+     * Author: Marena
      * Handles buying the utility.
      *
      * @param player The player buying the utility
@@ -142,6 +150,11 @@ public class UtilitySpace extends Space {
         }
     }
 
+    /**
+     * Author: Marena
+     * Returns a string representation of the utility space.
+     * @return
+     */
     @Override
     public String toString() {
         return super.toString() + " - Price: $" + price + ", Owner: " +

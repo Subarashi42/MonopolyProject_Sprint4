@@ -1,9 +1,16 @@
+/**
+ * Monopoly Game
+ * this class represents a player in the game of Monopoly.
+ * It manages the player's money, position, properties, and game actions.
+ */
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
+ * Author: Marena
  * Represents a player in the Monopoly game.
  * Manages the player's money, position, properties, and game actions.
  */
@@ -20,6 +27,8 @@ public class Player {
     public Dice dice;  // Made public for easier access
 
     /**
+     * Author: Aiden Clare
+     * edited by Marena
      * Constructs a new player with the given name.
      *
      * @param name The player's name
@@ -38,6 +47,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the player's name.
      *
      * @return The player's name
@@ -47,6 +57,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the player's token.
      *
      * @return The player's token
@@ -56,6 +67,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Allows the player to choose a token. Ensures they pick an available one.
      *
      * @param chosenToken The token the player wants to use
@@ -74,6 +86,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the player's current money amount.
      *
      * @return The player's money
@@ -83,6 +96,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the player's current position on the board.
      *
      * @return The player's position
@@ -92,6 +106,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Sets the player's position on the board.
      *
      * @param position The new position
@@ -101,6 +116,7 @@ public class Player {
     }
 
     /**
+     * Author: Tati Curtis
      * Adds money to the player's account.
      *
      * @param amount The amount to add
@@ -111,6 +127,7 @@ public class Player {
     }
 
     /**
+     * Author: Tati Curtis
      * Subtracts money from the player's account if they have enough.
      *
      * @param amount The amount to subtract
@@ -127,6 +144,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets the player's current balance.
      *
      * @return The player's money
@@ -136,6 +154,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Gets a string representation of the player's tokens and position.
      *
      * @return A string with the player's information
@@ -145,6 +164,7 @@ public class Player {
     }
 
     /**
+     * Author: Aiden Clare
      * Handles buying property if the player has enough money.
      *
      * @param property The property to buy
@@ -165,6 +185,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Pays rent to another player.
      *
      * @param owner The property owner receiving the rent
@@ -185,6 +206,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Receives rent from another player.
      *
      * @param amount The amount of rent received
@@ -194,6 +216,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Mortgages a property to get cash from the bank.
      * The property must be owned by this player and not already mortgaged.
      *
@@ -234,6 +257,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Unmortgages a property by paying the unmortgage cost to the bank.
      * The property must be owned by this player and currently mortgaged.
      *
@@ -276,6 +300,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Gets all mortgaged properties owned by this player.
      *
      * @return The list of mortgaged properties
@@ -285,6 +310,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Checks if a property is mortgaged.
      *
      * @param property The property to check
@@ -295,6 +321,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Gets all color groups that this player has a monopoly in.
      *
      * @param gameboard The game board
@@ -320,6 +347,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Buys a house for a property if possible.
      *
      * @param property The property to buy a house for
@@ -383,6 +411,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Buys a hotel for a property if possible.
      *
      * @param property The property to buy a hotel for
@@ -439,6 +468,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Checks if adding a house to a property will maintain even distribution across all properties in the color group.
      *
      * @param propertiesInGroup All properties in the color group
@@ -462,6 +492,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Sells a house from a property back to the bank.
      *
      * @param property The property to sell a house from
@@ -505,6 +536,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Determines if the player should go to jail based on dice rolls.
      *
      * @return true if the player should go to jail, false otherwise
@@ -534,6 +566,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Takes a turn for the player.
      *
      * @param gameboard The game board
@@ -583,6 +616,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Handles a player's turn when they are in jail.
      *
      * @param gameState The current game state
@@ -653,6 +687,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Performs dynamic turn steps based on where the player landed.
      * This method should be called after the player has moved to a new position.
      *
@@ -701,6 +736,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Handles the effects of Chance and Community Chest cards.
      * This is a simplified implementation that handles a few common card effects.
      *
@@ -751,6 +787,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Handles landing on a tax space.
      *
      * @param taxSpace The tax space landed on
@@ -769,6 +806,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Deducts money from the player's account.
      * Alias for subtractMoney for compatibility.
      *
@@ -779,6 +817,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Gets all properties owned by this player.
      *
      * @return The list of properties owned by the player
@@ -788,6 +827,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Sets whether this player has a Get Out of Jail Free card.
      *
      * @param hasCard Whether the player has the card
@@ -797,6 +837,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Checks if the player has a Get Out of Jail Free card.
      *
      * @return true if the player has the card, false otherwise
@@ -806,6 +847,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Gets the number of turns the player has been in jail.
      *
      * @return The number of turns in jail
@@ -815,6 +857,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Sets the number of turns the player has been in jail.
      *
      * @param turns The number of turns
@@ -824,6 +867,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Checks if the player is bankrupt (has no money).
      *
      * @return true if the player is bankrupt, false otherwise
@@ -833,6 +877,7 @@ public class Player {
     }
 
     /**
+     * Author: Marena
      * Returns a string representation of the player.
      *
      * @return A string representation of the player
