@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
-    * Author: Tati Curtis
+    * Author: Marena Abboud
     * This class represents the Chance Cards in the game of Monopoly.
     * The class implements the ChestAndCardSpot interface.
     * The class has a Map of Chance Cards. And is responsible for shuffling the cards.
@@ -19,13 +19,13 @@ import java.util.ArrayList;
 
 public class ChanceCards implements ChestAndCardSpot {
     /**
-     * Author: Tati Curtis
+     * Author: Marena Abboud
      * This is a map of the Chance Cards.
      * The key is the card name and the value is the card description.
      */
     private static Map<String, String> chanceCards;
      /**
-     *  Author: Tati Curtis
+     *  Author: Marena Abboud
      * This is the constructor for the ChanceCards class.
      * It initializes the chanceCards map.
      */
@@ -35,7 +35,7 @@ public class ChanceCards implements ChestAndCardSpot {
     }
 
     /**
-     * Author: Tati Curtis
+     * Author: Marena Abboud
      * This method is used to shuffle the cards.
      */
     public Map<String, String> getChanceCards()
@@ -53,7 +53,7 @@ public class ChanceCards implements ChestAndCardSpot {
     }
 
     /**
-     * Author: Tati Curtis
+     * Author: Marena Abboud
      * This method is used to create the chance cards.
      * It initializes the chanceCards map with the card name and description.
      * @see ChanceCards
@@ -76,7 +76,7 @@ public class ChanceCards implements ChestAndCardSpot {
         chanceCards.put("Card15", "Your Building Loan Matures. Collect $150.");
         chanceCards.put("Card16", "Advance Token to Nearest Railroad and Pay Owner Twice the Rental to Which He is Otherwise Entitled. If Railroad is Unowned, You May Buy it from the Bank.");
     }
-    /** Author: Tati Curtis
+    /** Author: Marena Abboud
      * Edited by: Aiden Clare
      * This method is used to shuffle the cards.
      * It returns a random card from the chanceCards map.
