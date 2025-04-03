@@ -7,20 +7,19 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Author: Marena Abboud
+ *
+ * This class represents the tokens for the Monopoly game.
+ */
+
 public class Tokens {
-    /**
-     * Author: Aiden Clare
-     * This is a list of the available tokens.
-     */
 
     public static final String[] TOKENS = {
             "Top Hat", "Thimble", "Iron", "Boot", "Battleship",
             "Cannon", "Race Car", "Scottie Dog", "Wheelbarrow"
     };
-    /**
-     * Author: Aiden Clare
-     * this creates a list of the available tokens.
-     */
+
 
     private static ArrayList<String> availableTokens = new ArrayList<>();
     private String owner;
@@ -43,14 +42,12 @@ public class Tokens {
      * @param token
      * @return
      */
-
-    // Checks if a token is still available for selection
     public static boolean isTokenAvailable(String token) {
         return availableTokens.contains(token);
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to assign a token to a player.
      * @param token
      * @return
@@ -76,7 +73,7 @@ public class Tokens {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to get the list of available tokens.
      */
 
@@ -87,7 +84,7 @@ public class Tokens {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to assign a token to a player.
      * @return
      */
@@ -100,7 +97,7 @@ public class Tokens {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to choose a token for a player.
      * @param player1
      * @param raceCar
@@ -112,7 +109,7 @@ public class Tokens {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to move a token to a new position.
      * @param player
      * @param position
@@ -122,7 +119,7 @@ public class Tokens {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to get the list of available tokens.
      * @return
      */
@@ -140,8 +137,6 @@ public class Tokens {
      * This method is used to get the owner of the token.
      * @return
      */
-
-    // Getter for owner
     public String getOwner() {
         return owner;
     }
@@ -162,8 +157,6 @@ public class Tokens {
      * This method is used to set the owner of the token.
      * @param owner
      */
-
-    // Setter for owner
     public void setOwner(String owner) {
         this.owner = owner;
     }
@@ -174,7 +167,6 @@ public class Tokens {
      * @param boardPosition
      */
 
-    // Setter for board position
     public void setBoardPosition(int boardPosition) {
         this.boardPosition = boardPosition;
     }
@@ -185,7 +177,6 @@ public class Tokens {
      * @return
      */
 
-    // String representation of the token with owner and board position
     @Override
     public String toString() {
         return owner + " - " + boardPosition;
