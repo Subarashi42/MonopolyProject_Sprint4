@@ -1,4 +1,5 @@
 /**
+ * Author: Marena
  * Represents a Property Title Deed Card in the Monopoly game.
  * Contains all information about a property including rent values and mortgage details.
  */
