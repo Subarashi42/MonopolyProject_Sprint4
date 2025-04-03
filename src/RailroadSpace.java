@@ -1,4 +1,5 @@
 /**
+ * Author: Marena
  * RailroadSpace.java
  * this class represents a railroad space on the Monopoly board.
  * It extends the Space class.
