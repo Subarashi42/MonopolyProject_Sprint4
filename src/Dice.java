@@ -110,7 +110,7 @@ public class Dice {
     }
 
     /**
-     * Author: Aiden Clare
+     * Author: Marena Abboud
      * This method is used to check if the player should go to jail.
      * It checks if the player has rolled three consecutive doubles.
      * @return
