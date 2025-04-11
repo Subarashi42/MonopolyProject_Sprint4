@@ -7,6 +7,7 @@ import Model.Spaces.UtilitySpace;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class PlayerTest {
     private Player player;
     private Gameboard gameboard;
     private GameState gameState;
+
+    private Dice mockDice;
 
 
     @Test
@@ -344,7 +347,113 @@ public class PlayerTest {
         assertEquals(10, testPlayer.getPosition());
         assertTrue(testGameState.isPlayerInJail(testPlayer));
 
-        // Add more card effect tests as needed...
     }
+    /**
+     * Simplified test for handleJailTurn method
+     */
+    public class HandleJailTurnTest {
+        private Player player;
+        private Gameboard gameboard;
+        private GameState gameState;
+
+        @Before
+        public void setUp() {
+            // Create game components
+            gameboard = new Gameboard();
+            player = new Player("Jail Test Player");
+            List<Player> players = new ArrayList<>();
+            players.add(player);
+            gameState = new GameState(players, gameboard);
+        }
+
+        /**
+         * Helper method to invoke private handleJailTurn method via reflection
+         */
+        private void invokeHandleJailTurn() throws Exception {
+            Method method = player.getClass().getDeclaredMethod("handleJailTurn", GameState.class);
+            method.setAccessible(true);
+            method.invoke(player, gameState);
+        }
+
+        @Test
+        public void testPayToGetOutOfJail() throws Exception {
+            // Send player to jail
+            gameState.sendToJail(player);
+            assertTrue(gameState.isPlayerInJail(player));
+
+            // Ensure player has enough money
+            player.addMoney(100);
+            int initialMoney = player.getMoney();
+
+            // Invoke handleJailTurn
+            invokeHandleJailTurn();
+
+            // Verify player is out of jail
+            assertFalse(gameState.isPlayerInJail(player));
+
+            // Verify money is deducted
+            assertTrue(player.getMoney() < initialMoney);
+        }
+
+        @Test
+        public void testUseGetOutOfJailFreeCard() throws Exception {
+            // Send player to jail
+            gameState.sendToJail(player);
+            assertTrue(gameState.isPlayerInJail(player));
+
+            // Give player a Get Out of Jail Free card
+            player.setHasGetOutOfJailFreeCard(true);
+
+            // Invoke handleJailTurn
+            invokeHandleJailTurn();
+
+            // Verify player is out of jail
+            assertFalse(gameState.isPlayerInJail(player));
+
+            // Verify card is used
+            assertFalse(player.hasGetOutOfJailFreeCard());
+        }
+
+        @Test
+        public void testIncrementTurnsInJail() throws Exception {
+            // Send player to jail
+            gameState.sendToJail(player);
+            assertTrue(gameState.isPlayerInJail(player));
+
+            // Remember initial turns in jail
+            int initialTurns = player.getTurnsInJail();
+
+            // Invoke handleJailTurn
+            invokeHandleJailTurn();
+
+            // Verify turns in jail incremented
+            assertEquals(initialTurns + 1, player.getTurnsInJail());
+        }
+
+        @Test
+        public void testMandatoryReleaseAfterThreeTurns() throws Exception {
+            // Send player to jail
+            gameState.sendToJail(player);
+
+            // Set turns in jail to 3
+            player.setTurnsInJail(3);
+
+            // Ensure player has enough money
+            player.addMoney(100);
+            int initialMoney = player.getMoney();
+
+            // Invoke handleJailTurn
+            invokeHandleJailTurn();
+
+            // Verify player is out of jail
+            assertFalse(gameState.isPlayerInJail(player));
+
+            // Verify money is deducted
+            assertTrue(player.getMoney() < initialMoney);
+        }
+
+
+    }
+
 
 }
