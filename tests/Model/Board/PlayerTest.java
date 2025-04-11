@@ -1,10 +1,14 @@
 package Model.Board;
 
+import Model.GameState;
 import Model.Property.Property;
 import Model.Spaces.RailroadSpace;
 import Model.Spaces.UtilitySpace;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -206,4 +210,30 @@ public class PlayerTest {
         assertTrue(playerString.contains(String.valueOf(player.getPosition())));
         assertTrue(playerString.contains(player.getToken()));
     }
+
+    @Test
+    public void testCardEffects() {
+        // Create a game state and board for testing
+        Gameboard testBoard = new Gameboard();
+        List<Player> testPlayers = new ArrayList<>();
+        Player testPlayer = new Player("Test Player");
+        Player otherPlayer = new Player("Other Player");
+        testPlayers.add(testPlayer);
+        testPlayers.add(otherPlayer);
+        GameState testGameState = new GameState(testPlayers, testBoard);
+
+        // Test Advance to Go
+        int initialMoney = testPlayer.getMoney();
+        testPlayer.processCardEffect("Advance to Go. Collect $200.", testGameState);
+        assertEquals(0, testPlayer.getPosition());
+        assertEquals(initialMoney + 200, testPlayer.getMoney());
+
+        // Test Go to Jail
+        testPlayer.processCardEffect("Go to Jail. Go directly to Jail.", testGameState);
+        assertEquals(10, testPlayer.getPosition());
+        assertTrue(testGameState.isPlayerInJail(testPlayer));
+
+        // Add more card effect tests as needed...
+    }
+
 }

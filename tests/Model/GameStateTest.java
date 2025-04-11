@@ -5,6 +5,9 @@ import Model.Board.Dice;
 import Model.Board.Gameboard;
 import Model.Board.Player;
 import Model.Property.Property;
+import Model.Spaces.RailroadSpace;
+import Model.Spaces.Space;
+import Model.Spaces.UtilitySpace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -485,5 +488,55 @@ public class GameStateTest {
         // Check player1 is out but player2 still in
         assertFalse(gameState.isPlayerInJail(player1));
         assertTrue(gameState.isPlayerInJail(player2));
+    }
+
+    @Test
+    public void testHandlePlayerBankruptcyWithRailroadsAndUtilities() {
+        // Create a test player with properties, railroads, and utilities
+        Player bankruptPlayer = new Player("Bankrupt");
+        players.add(bankruptPlayer);
+
+        // Add some properties to the player
+        Property property = new Property("Test Property", 1, 200, "Brown");
+        property.setOwner(bankruptPlayer);
+        bankruptPlayer.getProperties().add(property);
+
+        // Find a railroad and utility to assign to the player
+        RailroadSpace railroad = null;
+        UtilitySpace utility = null;
+
+        for (Space space : board.getSpaces()) {
+            if (space instanceof RailroadSpace && railroad == null) {
+                railroad = (RailroadSpace) space;
+                railroad.setOwner(bankruptPlayer);
+            } else if (space instanceof UtilitySpace && utility == null) {
+                utility = (UtilitySpace) space;
+                utility.setOwner(bankruptPlayer);
+            }
+
+            if (railroad != null && utility != null) break;
+        }
+
+        // Make player bankrupt
+        bankruptPlayer.subtractMoney(1500); // Remove all money
+
+        // Make sure these were set properly
+        assertNotNull("Railroad should have been found and owned by player", railroad);
+        assertNotNull("Utility should have been found and owned by player", utility);
+        assertEquals(bankruptPlayer, railroad.getOwner());
+        assertEquals(bankruptPlayer, utility.getOwner());
+
+        // Handle bankruptcy
+        gameState.handlePlayerBankruptcy(bankruptPlayer);
+
+        // Check player was removed
+        assertFalse(players.contains(bankruptPlayer));
+
+        // Check property was returned to bank
+        assertNull("Property owner should be null after bankruptcy", property.getOwner());
+
+        // Check railroad and utility owners are reset
+        assertNull("Railroad owner should be null after bankruptcy", railroad.getOwner());
+        assertNull("Utility owner should be null after bankruptcy", utility.getOwner());
     }
 }
