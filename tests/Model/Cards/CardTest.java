@@ -1,10 +1,11 @@
 package Model.Cards;
 
+import Model.Board.Gameboard;
 import Model.Board.Player;
 import Model.GameState;
-import Model.Board.Gameboard;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
