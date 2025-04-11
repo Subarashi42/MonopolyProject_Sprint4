@@ -100,6 +100,7 @@ public class Hotels {
      */
     @Override
     public String toString() {
-        return "Model.Hotels available: " + availableHotels + " out of " + TOTAL_HOTELS;
+        // Change from "Model.Hotels available: ..." to just "Hotels available: ..."
+        return "Hotels available: " + availableHotels + " out of " + TOTAL_HOTELS;
     }
 }

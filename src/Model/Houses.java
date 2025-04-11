@@ -112,6 +112,7 @@ public class Houses {
      */
     @Override
     public String toString() {
-        return "Model.Houses available: " + availableHouses + " out of " + TOTAL_HOUSES;
+        // Change from "Model.Houses available: ..." to just "Houses available: ..."
+        return "Houses available: " + availableHouses + " out of " + TOTAL_HOUSES;
     }
 }
