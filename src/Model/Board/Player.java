@@ -11,10 +11,6 @@ import Model.Spaces.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a player in the Monopoly game.
- * Manages the player's money, position, properties, and game actions.
- */
 public class Player {
     private String name;
     private int money;
