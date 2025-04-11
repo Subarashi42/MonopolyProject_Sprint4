@@ -18,6 +18,117 @@ import static org.junit.Assert.*;
 public class PlayerTest {
 
     private Player player;
+    private Gameboard gameboard;
+    private GameState gameState;
+
+
+    @Test
+    public void testChooseTokenAlreadyTaken() {
+        // Reset tokens first
+        Tokens.initializeTokens();
+
+        // First player chooses a token
+        assertTrue(player.chooseToken("Race Car"));
+
+        // Create another player
+        Player player2 = new Player("Player 2");
+
+        // Second player should not be able to choose the same token
+        assertFalse(player2.chooseToken("Race Car"));
+    }
+
+    @Test
+    public void testMortgageComplexScenarios() {
+        // Create a property
+        Property property = new Property("Test Property", 1, 200, "Brown");
+        property.setOwner(player);
+        player.getProperties().add(property);
+
+        // Cannot mortgage property with houses
+        property.setHouses(1);
+        assertFalse(player.mortgageProperty(property));
+
+        // Remove houses
+        property.setHouses(0);
+
+        // Mortgage the property
+        assertTrue(player.mortgageProperty(property));
+        assertTrue(property.isMortgaged());
+        assertTrue(player.getMortgagedProperties().contains(property));
+
+        // Cannot mortgage an already mortgaged property
+        assertFalse(player.mortgageProperty(property));
+    }
+
+    @Test
+    public void testUnmortgageProperty() {
+        // Create a property
+        Property property = new Property("Test Property", 1, 200, "Brown");
+        property.setOwner(player);
+        player.getProperties().add(property);
+
+        // Mortgage the property
+        player.mortgageProperty(property);
+
+        // Add money to unmortgage
+        player.addMoney(property.getUnmortgageCost());
+
+        // Unmortgage the property
+        assertTrue(player.unmortgageProperty(property));
+        assertFalse(property.isMortgaged());
+        assertFalse(player.getMortgagedProperties().contains(property));
+
+        // Cannot unmortgage a property not mortgaged
+        assertFalse(player.unmortgageProperty(property));
+    }
+
+
+
+    @Test
+    public void testInvalidCardEffect() {
+        int initialMoney = player.getMoney();
+        int initialPosition = player.getPosition();
+
+        // Test an invalid or unrecognized card effect
+        player.processCardEffect("Some random card effect", gameState);
+
+        // Verify no changes occurred
+        assertEquals(initialMoney, player.getMoney());
+        assertEquals(initialPosition, player.getPosition());
+    }
+
+
+
+    @Test
+    public void testChooseTokenEdgeCases() {
+        // Reset tokens
+        Tokens.initializeTokens();
+
+        // Choose all tokens
+        String[] tokens = Tokens.TOKENS;
+        for (String token : tokens) {
+            Player tempPlayer = new Player("Temp Player");
+            assertTrue(tempPlayer.chooseToken(token));
+        }
+
+        // Verify no more tokens are available
+        Player finalPlayer = new Player("Final Player");
+        assertFalse(finalPlayer.chooseToken("Any Token"));
+    }
+
+
+    @Test
+    public void testReceiveRentMultipleTimes() {
+        int initialMoney = player.getMoney();
+        int[] rentAmounts = {50, 75, 100};
+
+        for (int rentAmount : rentAmounts) {
+            player.receiveRent(rentAmount);
+        }
+
+        int totalRentReceived = 50 + 75 + 100;
+        assertEquals(initialMoney + totalRentReceived, player.getMoney());
+    }
 
     @Before
     public void setUp() {
