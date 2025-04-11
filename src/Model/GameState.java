@@ -4,11 +4,12 @@ import Model.Board.Bank;
 import Model.Board.Dice;
 import Model.Board.Gameboard;
 import Model.Board.Player;
-import Model.Cards.Card;
 import Model.Cards.ChanceCard;
 import Model.Cards.CommunityChestCard;
 import Model.Property.Property;
+import Model.Spaces.RailroadSpace;
 import Model.Spaces.Space;
+import Model.Spaces.UtilitySpace;
 
 import java.util.*;
 
@@ -461,14 +462,28 @@ public class GameState {
             bank.getAvailableProperties().add(property);
         }
 
+        // Also check railroads and utilities owned by this player
+        for (Space space : board.getSpaces()) {
+            if (space instanceof RailroadSpace) {
+                RailroadSpace railroad = (RailroadSpace) space;
+                if (player.equals(railroad.getOwner())) {
+                    railroad.setOwner(null);
+                }
+            } else if (space instanceof UtilitySpace) {
+                UtilitySpace utility = (UtilitySpace) space;
+                if (player.equals(utility.getOwner())) {
+                    utility.setOwner(null);
+                }
+            }
+        }
+
         // Remove player from the game
         players.remove(player);
-        isInJail.remove(player);
 
         // Check if game is over
         if (players.size() == 1) {
             System.out.println(players.get(0).getName() + " wins the game!");
-            gameActive = false;
+            setGameActive(false);
         }
     }
 

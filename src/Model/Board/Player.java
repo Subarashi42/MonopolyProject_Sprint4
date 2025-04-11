@@ -9,9 +9,7 @@ import Model.Property.Property;
 import Model.Spaces.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a player in the Monopoly game.
@@ -45,6 +43,12 @@ public class Player {
         this.hasGetOutOfJailFreeCard = false;
         this.turnsInJail = 0;
         this.dice = new Dice();
+    }
+
+    // Add this to your Player class
+    public void processCardEffect(String cardText, GameState gameState) {
+        // This is a public wrapper method that calls the private method
+        handleCardEffect(cardText, gameState);
     }
 
     /**
