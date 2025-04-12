@@ -20,7 +20,6 @@ public class Tokens {
             "Cannon", "Race Car", "Scottie Dog", "Wheelbarrow"
     };
 
-
     private static ArrayList<String> availableTokens = new ArrayList<>();
     private String owner;
     private int boardPosition;
@@ -29,8 +28,6 @@ public class Tokens {
      * Author: Aiden Clare
      * This method is used to initialize the available tokens.
      */
-
-    // Initialize the available tokens
     public static void initializeTokens() {
         availableTokens.clear(); // Reset the list
         availableTokens.addAll(Arrays.asList(TOKENS));
@@ -52,8 +49,6 @@ public class Tokens {
      * @param token
      * @return
      */
-
-    // Assigns a token to a player if it's available
     public static boolean assignToken(String token) {
         if (availableTokens.contains(token)) {
             availableTokens.remove(token);
@@ -66,34 +61,30 @@ public class Tokens {
      * Author: Aiden Clare
      * This method is used to remove a token from the available tokens.
      */
-
-    // Displays the list of remaining available tokens
     public static void displayAvailableTokens() {
         System.out.println("Available tokens: " + availableTokens);
     }
 
     /**
      * Author: Marena Abboud
-     * This method is used to get the list of available tokens.
+     * Assigns a token from the available tokens and returns it as a char array.
+     * @return A char array of the token, or null if no tokens are available
      */
-
-    // Constructor for setting owner and board position
-    public Tokens() {
-        this.owner = null;
-        this.boardPosition = 0;
+    public static char[] assignToken() {
+        if (!availableTokens.isEmpty()) {
+            String token = availableTokens.remove(0);
+            return token.toCharArray();
+        }
+        return null;
     }
 
     /**
      * Author: Marena Abboud
-     * This method is used to assign a token to a player.
-     * @return
+     * This method is used to get the list of available tokens.
      */
-
-    public static char[] assignToken() {
-        if (availableTokens.size() > 0) {
-            return availableTokens.remove(0).toCharArray();
-        }
-        return null;
+    public Tokens() {
+        this.owner = null;
+        this.boardPosition = 0;
     }
 
     /**
@@ -103,7 +94,6 @@ public class Tokens {
      * @param raceCar
      * @return
      */
-
     public static boolean chooseToken(Player player1, String raceCar) {
         return false;
     }
@@ -114,7 +104,6 @@ public class Tokens {
      * @param player
      * @param position
      */
-
     public static void moveToken(Player player, int position) {
     }
 
@@ -123,13 +112,12 @@ public class Tokens {
      * This method is used to get the list of available tokens.
      * @return
      */
-
     public static String getavailabletokens() {
         if (availableTokens.size() > 0) {
             return availableTokens.toString();
         }
         else
-        return "No tokens available";
+            return "No tokens available";
     }
 
     /**
@@ -146,8 +134,6 @@ public class Tokens {
      * This method is used to get the board position of the token.
      * @return
      */
-
-    // Getter for board position
     public int getBoardPosition() {
         return boardPosition;
     }
@@ -166,7 +152,6 @@ public class Tokens {
      * This method is used to set the board position of the token.
      * @param boardPosition
      */
-
     public void setBoardPosition(int boardPosition) {
         this.boardPosition = boardPosition;
     }
@@ -176,7 +161,6 @@ public class Tokens {
      * This method is used to get the string representation of the token.
      * @return
      */
-
     @Override
     public String toString() {
         return owner + " - " + boardPosition;
