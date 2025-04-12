@@ -8,7 +8,6 @@ package Model.Board;
 import Model.Houses;
 import Model.Property.Property;
 import Model.Spaces.RailroadSpace;
-import Model.Spaces.Space;
 import Model.Spaces.UtilitySpace;
 
 import java.util.ArrayList;
@@ -472,4 +471,6 @@ public class Bank {
     public int getHotels() {
         return hotels;
     }
+
+
 }
