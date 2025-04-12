@@ -302,6 +302,10 @@ public class Player {
         } else if (cardText.contains("Get out of Jail Free")) {
             hasGetOutOfJailFreeCard = true;
             System.out.println(name + " received a Get Out of Jail Free card");
+        } else if (cardText.contains("dividend of $50")) {
+            // Handle dividend card specifically
+            addMoney(50);
+            System.out.println(name + " received $50 from the bank");
         } else if (cardText.contains("collect") || cardText.contains("Collect") ||
                 cardText.contains("receive") || cardText.contains("Receive")) {
             // Extract amount and add to player
