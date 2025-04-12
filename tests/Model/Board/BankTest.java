@@ -6,6 +6,8 @@ import Model.Spaces.UtilitySpace;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -265,5 +267,149 @@ public class BankTest {
 
         // Just verify the method exists
         assertNotNull(bank.getHotels());
+    }
+
+    @Test
+    public void testAuctionProperty_NoValidBidders() {
+        // Create a test property
+        Property property = new Property("Test Property", 1, 200, "Brown");
+
+        // Create players with no money
+        List<Player> brokePlayersList = new ArrayList<>();
+        Player brokePlayer1 = new Player("Broke Player 1");
+        brokePlayer1.subtractMoney(brokePlayer1.getMoney());
+        Player brokePlayer2 = new Player("Broke Player 2");
+        brokePlayer2.subtractMoney(brokePlayer2.getMoney());
+        brokePlayersList.add(brokePlayer1);
+        brokePlayersList.add(brokePlayer2);
+
+        // Capture system output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // Attempt auction with no valid bidders
+            bank.auctionProperty(property, brokePlayersList);
+
+            // Verify output and property remains with bank
+            String output = outContent.toString();
+            assertTrue(output.contains("No one bid on"));
+            assertTrue(output.contains("It remains with the bank"));
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    public void testAuctionRailroad_NoValidBidders() {
+        // Create a test railroad
+        RailroadSpace railroad = new RailroadSpace("Test Railroad", 5);
+
+        // Create players with no money
+        List<Player> brokePlayersList = new ArrayList<>();
+        Player brokePlayer1 = new Player("Broke Player 1");
+        brokePlayer1.subtractMoney(brokePlayer1.getMoney());
+        Player brokePlayer2 = new Player("Broke Player 2");
+        brokePlayer2.subtractMoney(brokePlayer2.getMoney());
+        brokePlayersList.add(brokePlayer1);
+        brokePlayersList.add(brokePlayer2);
+
+        // Capture system output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // Attempt auction with no valid bidders
+            bank.auctionRailroad(railroad, brokePlayersList);
+
+            // Verify output
+            String output = outContent.toString();
+            assertTrue(output.contains("No one bid on"));
+            assertTrue(output.contains("It remains with the bank"));
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    public void testAuctionUtility_NoValidBidders() {
+        // Create a test utility
+        UtilitySpace utility = new UtilitySpace("Test Utility", 12);
+
+        // Create players with no money
+        List<Player> brokePlayersList = new ArrayList<>();
+        Player brokePlayer1 = new Player("Broke Player 1");
+        brokePlayer1.subtractMoney(brokePlayer1.getMoney());
+        Player brokePlayer2 = new Player("Broke Player 2");
+        brokePlayer2.subtractMoney(brokePlayer2.getMoney());
+        brokePlayersList.add(brokePlayer1);
+        brokePlayersList.add(brokePlayer2);
+
+        // Capture system output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // Attempt auction with no valid bidders
+            bank.auctionUtility(utility, brokePlayersList);
+
+            // Verify output
+            String output = outContent.toString();
+            assertTrue(output.contains("No one bid on"));
+            assertTrue(output.contains("It remains with the bank"));
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+
+
+    @Test
+    public void testSellHouses_EvenDistributionFailure() {
+        // Create a test property for this scenario
+        Property property = new Property("Test Property", 1, 200, "Brown");
+
+        // Create a detailed scenario for house distribution failure
+        // This requires mocking the gameboard to return specific properties
+        Gameboard mockGameboard = new Gameboard() {
+            @Override
+            public List<Property> getPropertiesByColorGroup(String colorGroup) {
+                List<Property> properties = new ArrayList<>();
+                Property prop1 = new Property("Prop 1", 1, 200, "Brown");
+                Property prop2 = new Property("Prop 2", 3, 200, "Brown");
+                prop1.setHouses(1);
+                prop2.setHouses(0);
+                properties.add(prop1);
+                properties.add(prop2);
+                return properties;
+            }
+
+            @Override
+            public boolean playerOwnsAllInColorGroup(Player p, String colorGroup) {
+                return true;
+            }
+        };
+
+        // Prepare the property
+        property.setOwner(player);
+
+        // Capture system output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // Attempt to sell houses that would create uneven distribution
+            boolean result = bank.sellHouses(property, player, 2, mockGameboard);
+
+            // Verify failure
+            assertFalse(result);
+            assertTrue(outContent.toString().contains("Houses must be evenly distributed"));
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 }
