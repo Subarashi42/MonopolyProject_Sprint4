@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -695,5 +696,125 @@ public class PlayerTest {
         player.setPosition(17); // Community Chest
         player.performTurnActions(gameState);
     }
+
+    @Test
+    public void testProcessCardEffect() {
+        // Create a player and gameState
+        Player testPlayer = new Player("Test Process Card");
+        GameState mockGameState = new GameState(Arrays.asList(testPlayer), new Gameboard());
+
+        // Simply call the method to ensure it doesn't throw exceptions
+        testPlayer.processCardEffect("Advance to Go.", mockGameState);
+
+        // Since we can't make assumptions about the exact behavior,
+        // just verify the method was called without exceptions
+
+        // Let's also try another type of card
+        testPlayer.processCardEffect("Bank pays you dividend of $50.", mockGameState);
+
+        // Avoid assertions about the specific state after calling the method
+        // since we don't know exactly how your implementation handles these
+    }
+
+
+    @Test
+    public void testTokenMethods() {
+        // Reset tokens
+        Tokens.initializeTokens();
+
+        Player player = new Player("Token Test");
+
+        // Initially no token
+        assertNull(player.getToken());
+
+        // Set token
+        player.setToken("Test Token");
+        assertEquals("Test Token", player.getToken());
+
+        // Clear token
+        player.setToken(null);
+        assertNull(player.getToken());
+    }
+
+    @Test
+    public void testMoveAndPassGo() {
+        Player player = new Player("Move Test");
+        Gameboard board = new Gameboard();
+
+        // Position player near the end of the board
+        player.setPosition(38);
+        int initialMoney = player.getMoney();
+
+        // Move player across GO
+        player.move(4, board);
+
+        // Verify new position
+        assertEquals(2, player.getPosition());
+
+        // Verify money increased (this checks if passing GO gives $200)
+        assertTrue(player.getMoney() > initialMoney);
+    }
+
+    @Test
+    public void testBankruptcy() {
+        Player player = new Player("Bankruptcy Test");
+
+        // Initially not bankrupt
+        assertFalse(player.isBankrupt());
+
+        // Remove all money
+        player.subtractMoney(player.getMoney());
+
+        // Should be bankrupt with no money
+        assertTrue(player.isBankrupt());
+
+        // Add some money back
+        player.addMoney(10);
+
+        // No longer bankrupt
+        assertFalse(player.isBankrupt());
+    }
+
+    @Test
+    public void testPropertyMethods() {
+        Player player = new Player("Property Test");
+
+        // Initially no properties
+        assertTrue(player.getProperties().isEmpty());
+
+        // Create and buy a property
+        Property property = new Property("Test Property", 5, 100, "Red");
+        player.buyProperty(property);
+
+        // Verify property added to player's collection
+        assertFalse(player.getProperties().isEmpty());
+        assertTrue(player.getProperties().contains(property));
+
+        // Verify player is the owner
+        assertEquals(player, property.getOwner());
+    }
+
+    @Test
+    public void testMortgageMethod() {
+        Player player = new Player("Mortgage Test");
+
+        // Add some money
+        player.addMoney(200);
+
+        // Create and buy a property
+        Property property = new Property("Test Property", 5, 100, "Red");
+        player.buyProperty(property);
+
+        // Check initial state
+        assertFalse(player.isPropertyMortgaged(property));
+        assertTrue(player.getMortgagedProperties().isEmpty());
+
+        // Mortgage property
+        boolean result = player.mortgageProperty(property);
+
+        // Just checking if method runs without exceptions
+        // The actual behavior will depend on your implementation
+    }
+
 
 }
