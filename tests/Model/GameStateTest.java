@@ -4,6 +4,8 @@ import Model.Board.Bank;
 import Model.Board.Dice;
 import Model.Board.Gameboard;
 import Model.Board.Player;
+import Model.Cards.ChanceCard;
+import Model.Cards.CommunityChestCard;
 import Model.Property.Property;
 import Model.Spaces.RailroadSpace;
 import Model.Spaces.Space;
@@ -11,6 +13,9 @@ import Model.Spaces.UtilitySpace;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -538,5 +543,338 @@ public class GameStateTest {
         // Check railroad and utility owners are reset
         assertNull("Railroad owner should be null after bankruptcy", railroad.getOwner());
         assertNull("Utility owner should be null after bankruptcy", utility.getOwner());
+    }
+
+    /**
+     * Test class for initializing card decks
+     */
+    @Test
+    public void testInitializeChanceCards() {
+        // Create a new GameState to test card initialization
+        GameState testState = new GameState(players, board);
+
+        // Get the initial Chance deck
+        List<ChanceCard> chanceDeck = testState.getChanceCardDeck();
+
+        // Check that cards were initialized
+        assertFalse(chanceDeck.isEmpty());
+
+        // Test drawing all cards to verify deck is reset/reshuffled
+        int deckSize = chanceDeck.size();
+        for (int i = 0; i < deckSize + 1; i++) {
+            String cardDescription = testState.drawChanceCard();
+            assertNotNull(cardDescription);
+            assertFalse(cardDescription.isEmpty());
+        }
+
+        // After drawing all cards, deck should have been reshuffled
+        assertFalse(testState.getChanceCardDeck().isEmpty());
+    }
+
+    /**
+     * Test for initializing Community Chest cards
+     */
+    @Test
+    public void testInitializeCommunityChestCards() {
+        // Create a new GameState to test card initialization
+        GameState testState = new GameState(players, board);
+
+        // Get the initial Community Chest deck
+        List<CommunityChestCard> communityChestDeck = testState.getCommunityChestCardDeck();
+
+        // Check that cards were initialized
+        assertFalse(communityChestDeck.isEmpty());
+
+        // Test drawing all cards to verify deck is reset/reshuffled
+        int deckSize = communityChestDeck.size();
+        for (int i = 0; i < deckSize + 1; i++) {
+            String cardDescription = testState.drawCommunityChestCard();
+            assertNotNull(cardDescription);
+            assertFalse(cardDescription.isEmpty());
+        }
+
+        // After drawing all cards, deck should have been reshuffled
+        assertFalse(testState.getCommunityChestCardDeck().isEmpty());
+    }
+
+    /**
+     * Tests for display methods (for coverage)
+     */
+    @Test
+    public void testDisplayMethods() {
+        // Capture System.out to verify output
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // Test displayGameState
+            gameState.displayGameState();
+            String output = outContent.toString();
+            assertTrue(output.contains("Game State"));
+
+            // Reset output capture
+            outContent.reset();
+
+            // Test displayPlayerStatus
+            gameState.displayPlayerStatus(player1);
+            output = outContent.toString();
+            assertTrue(output.contains(player1.getName()));
+            assertTrue(output.contains("$" + player1.getMoney()));
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    /**
+     * Test for initializing the game
+     */
+    @Test
+    public void testInitializeGameComprehensive() {
+        // Reset player money to ensure test is consistent
+        player1.subtractMoney(player1.getMoney());
+        player2.subtractMoney(player2.getMoney());
+
+        // Send a player to jail to test jail reset
+        gameState.sendToJail(player1);
+        assertTrue(gameState.isPlayerInJail(player1));
+
+        // Initialize the game
+        gameState.initializeGame();
+
+        // Check that players received starting money
+        assertEquals(1500, player1.getMoney());
+        assertEquals(1500, player2.getMoney());
+
+        // Check that player is no longer in jail
+        assertFalse(gameState.isPlayerInJail(player1));
+
+        // Check that game is active
+        assertTrue(gameState.isGameActive());
+
+        // Check that current player is reset
+        assertEquals(0, gameState.getCurrentPlayerIndex());
+    }
+
+    /**
+     * Test for returning Get Out of Jail Free card with both card types
+     */
+    @Test
+    public void testReturnGetOutOfJailFreeCardBothTypes() {
+        // Get initial deck sizes
+        int initialChanceSize = gameState.getChanceCardDeck().size();
+        int initialCommunityChestSize = gameState.getCommunityChestCardDeck().size();
+
+        // Return one of each card type
+        gameState.returnGetOutOfJailFreeCard("Chance");
+        gameState.returnGetOutOfJailFreeCard("Community Chest");
+
+        // Check that each deck increased by one
+        assertEquals(initialChanceSize + 1, gameState.getChanceCardDeck().size());
+        assertEquals(initialCommunityChestSize + 1, gameState.getCommunityChestCardDeck().size());
+
+        // Test with invalid card type (for coverage)
+        int sizeBeforeInvalid = gameState.getChanceCardDeck().size();
+        gameState.returnGetOutOfJailFreeCard("Invalid Type");
+        // Size should not change
+        assertEquals(sizeBeforeInvalid, gameState.getChanceCardDeck().size());
+    }
+
+    /**
+     * Test for bank interactions
+     */
+    @Test
+    public void testBankInteractions() {
+        // Reset player money
+        player1.subtractMoney(player1.getMoney());
+        player1.addMoney(1000);
+
+        // Test collecting from bank
+        gameState.collectFromBank(player1, 200);
+        assertEquals(1200, player1.getMoney());
+
+        // Test paying to bank
+        boolean result = gameState.payToBank(player1, 300);
+        assertTrue(result);
+        assertEquals(900, player1.getMoney());
+
+        // Test paying more than player has
+        result = gameState.payToBank(player1, 1000);
+        assertFalse(result);
+        assertEquals(900, player1.getMoney()); // Money should not change
+    }
+
+    /**
+     * Test for handling player bankruptcy more comprehensively
+     */
+    @Test
+    public void testHandlePlayerBankruptcyComprehensive() {
+        // Add a third test player
+        Player player3 = new Player("Test Player 3");
+        List<Player> threePlayers = new ArrayList<>(players);
+        threePlayers.add(player3);
+
+        // Create new game state with three players
+        GameState threePlayerState = new GameState(threePlayers, board);
+
+        // Create and set a bank for the new game state
+        Bank testBank = new Bank();
+        threePlayerState.setBank(testBank);
+
+        // Give player3 a property
+        Property property = new Property("Test Property", 1, 200, "Brown");
+        property.setOwner(player3);
+        player3.getProperties().add(property);
+
+        // Add property to bank's available properties list
+        List<Property> bankProperties = new ArrayList<>();
+        bankProperties.add(property);
+        testBank.setAvailableProperties(bankProperties);
+
+        // Set up railroads and utilities owned by player3
+        RailroadSpace railroad = null;
+        UtilitySpace utility = null;
+
+        for (Space space : board.getSpaces()) {
+            if (space instanceof RailroadSpace && railroad == null) {
+                railroad = (RailroadSpace) space;
+                railroad.setOwner(player3);
+            } else if (space instanceof UtilitySpace && utility == null) {
+                utility = (UtilitySpace) space;
+                utility.setOwner(player3);
+            }
+
+            if (railroad != null && utility != null) break;
+        }
+
+        // Make player bankrupt
+        player3.subtractMoney(player3.getMoney());
+
+        // Handle bankruptcy
+        threePlayerState.handlePlayerBankruptcy(player3);
+
+        // Check that player was removed
+        assertEquals(2, threePlayerState.getPlayers().size());
+        assertFalse(threePlayerState.getPlayers().contains(player3));
+
+        // Check that properties are returned to bank
+        assertNull(property.getOwner());
+
+        // Check that railroad and utility are returned to bank
+        if (railroad != null) assertNull(railroad.getOwner());
+        if (utility != null) assertNull(utility.getOwner());
+
+        // Check game is still active with 2 players
+        assertTrue(threePlayerState.isGameActive());
+
+        // Now make another player bankrupt leaving only one
+        threePlayerState.handlePlayerBankruptcy(threePlayerState.getPlayers().get(0));
+
+        // Check that game is now over with just one player
+        assertFalse(threePlayerState.isGameActive());
+        assertEquals(1, threePlayerState.getPlayers().size());
+    }
+
+    /**
+     * Test for drawing card edge cases
+     */
+    @Test
+    public void testDrawCardEdgeCases() {
+        // Create a game state with empty card decks for testing
+        GameState testState = new GameState(players, board);
+
+        // Create reflection method to set empty decks
+        try {
+            Field chanceDeckField = GameState.class.getDeclaredField("chanceCardDeck");
+            chanceDeckField.setAccessible(true);
+            chanceDeckField.set(testState, new ArrayList<>());
+
+            Field communityDeckField = GameState.class.getDeclaredField("communityChestCardDeck");
+            communityDeckField.setAccessible(true);
+            communityDeckField.set(testState, new ArrayList<>());
+
+            // Draw from empty decks - should initialize new decks
+            String chanceCard = testState.drawChanceCard();
+            String communityCard = testState.drawCommunityChestCard();
+
+            // Verify cards were drawn from newly initialized decks
+            assertNotNull(chanceCard);
+            assertNotNull(communityCard);
+            assertFalse(chanceCard.isEmpty());
+            assertFalse(communityCard.isEmpty());
+
+        } catch (Exception e) {
+            fail("Exception during reflection: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test for current player index edge cases
+     */
+    @Test
+    public void testCurrentPlayerIndexEdgeCases() {
+        // Test initial player index
+        assertEquals(0, gameState.getCurrentPlayerIndex());
+        assertEquals(player1, gameState.getCurrentPlayer());
+
+        // Test setting to valid index
+        gameState.setCurrentPlayerIndex(1);
+        assertEquals(1, gameState.getCurrentPlayerIndex());
+        assertEquals(player2, gameState.getCurrentPlayer());
+
+        // Test setting to invalid index (too high)
+        gameState.setCurrentPlayerIndex(999);
+        // Should remain at previous value
+        assertEquals(1, gameState.getCurrentPlayerIndex());
+
+        // Test setting to invalid index (negative)
+        gameState.setCurrentPlayerIndex(-5);
+        // Should remain at previous value
+        assertEquals(1, gameState.getCurrentPlayerIndex());
+
+        // Reset for other tests
+        gameState.setCurrentPlayerIndex(0);
+    }
+
+    /**
+     * Test for getting current player with empty player list
+     */
+    @Test
+    public void testGetCurrentPlayerWithEmptyList() {
+        List<Player> emptyPlayers = new ArrayList<>();
+        GameState emptyState = new GameState(emptyPlayers, board);
+
+        // Expect an IndexOutOfBoundsException
+        try {
+            Player currentPlayer = emptyState.getCurrentPlayer();
+            fail("Expected IndexOutOfBoundsException but no exception was thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // This is expected, test passes
+            assertTrue(e.getMessage().contains("Index 0 out of bounds for length 0"));
+        }
+    }
+
+    /**
+     * Test for jail mechanics edge cases
+     */
+    @Test
+    public void testJailMechanicsEdgeCases() {
+        // Test player not in map
+        Player unknownPlayer = new Player("Unknown");
+        assertFalse(gameState.isPlayerInJail(unknownPlayer));
+
+        // Test releasing player not in jail
+        assertFalse(gameState.isPlayerInJail(player1));
+        gameState.releaseFromJail(player1); // Should not throw exception
+        assertFalse(gameState.isPlayerInJail(player1));
+
+        // Test sending to jail twice
+        gameState.sendToJail(player1);
+        assertTrue(gameState.isPlayerInJail(player1));
+        gameState.sendToJail(player1); // Send again
+        assertTrue(gameState.isPlayerInJail(player1)); // Should still be in jail
+
+        // Release for other tests
+        gameState.releaseFromJail(player1);
     }
 }
