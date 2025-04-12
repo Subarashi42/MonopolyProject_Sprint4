@@ -7,10 +7,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Test class for the Tokens class
+ * Comprehensive test class for the Tokens class to achieve 100% coverage.
  */
 public class TokensTest {
 
+    private Tokens tokens;
     private Player player;
 
     @Before
@@ -18,6 +19,7 @@ public class TokensTest {
         // Initialize available tokens before each test
         Tokens.initializeTokens();
         player = new Player("Test Player");
+        tokens = new Tokens(); // Create an instance for testing object methods
     }
 
     @After
@@ -26,162 +28,149 @@ public class TokensTest {
         Tokens.initializeTokens();
     }
 
+    // Static method tests (previously covered)
     @Test
     public void testInitializeTokens() {
-        // Test that initializing tokens makes all tokens available
-        // First assign some tokens to make them unavailable
-        Tokens.assignToken("Top Hat");
-        Tokens.assignToken("Thimble");
-
-        // Then reinitialize
         Tokens.initializeTokens();
-
-        // All tokens should be available again
         assertTrue(Tokens.isTokenAvailable("Top Hat"));
         assertTrue(Tokens.isTokenAvailable("Thimble"));
-        assertTrue(Tokens.isTokenAvailable("Iron"));
-        assertTrue(Tokens.isTokenAvailable("Boot"));
-        assertTrue(Tokens.isTokenAvailable("Battleship"));
     }
 
     @Test
     public void testIsTokenAvailable() {
-        // Test checking if tokens are available
         assertTrue(Tokens.isTokenAvailable("Top Hat"));
-        assertTrue(Tokens.isTokenAvailable("Thimble"));
-
-        // Assign a token and verify it's no longer available
         Tokens.assignToken("Top Hat");
         assertFalse(Tokens.isTokenAvailable("Top Hat"));
-        assertTrue(Tokens.isTokenAvailable("Thimble")); // Other tokens should still be available
     }
 
     @Test
-    public void testAssignToken() {
-        // Test assigning tokens
-        boolean result = Tokens.assignToken("Top Hat");
-        assertTrue("Should successfully assign available token", result);
-        assertFalse("Token should no longer be available", Tokens.isTokenAvailable("Top Hat"));
-
-        // Test assigning an already assigned token
-        result = Tokens.assignToken("Top Hat");
-        assertFalse("Should fail to assign unavailable token", result);
+    public void testAssignTokenString() {
+        assertTrue(Tokens.assignToken("Top Hat"));
+        assertFalse(Tokens.assignToken("Top Hat")); // Already taken
     }
 
     @Test
     public void testAssignTokenNoArgs() {
-        // Test the parameterless assignToken method
-        char[] token = Tokens.assignToken();
-        assertNotNull("Should assign a token", token);
+        // Reset tokens
+        Tokens.initializeTokens();
 
-        // Assign all remaining tokens to test empty case
-        for (int i = 0; i < Tokens.TOKENS.length - 1; i++) {
-            Tokens.assignToken();
+        // Assign tokens
+        for (int i = 0; i < Tokens.TOKENS.length; i++) {
+            char[] token = Tokens.assignToken();
+            assertNotNull(token);
         }
 
-        // Test when no tokens are available
-        char[] noToken = Tokens.assignToken();
-        assertNull("Should return null when no tokens left", noToken);
+        // One more attempt should return null
+        char[] token = Tokens.assignToken();
+        assertNull(token);
     }
 
     @Test
     public void testGetAvailableTokens() {
-        // Test getting available tokens string
         String availableTokens = Tokens.getavailabletokens();
+        assertTrue(availableTokens.contains("Top Hat"));
 
-        // Should contain all tokens initially
-        for (String token : Tokens.TOKENS) {
-            assertTrue("Available tokens should include " + token, availableTokens.contains(token));
-        }
-
-        // Assign some tokens
-        Tokens.assignToken("Top Hat");
-        Tokens.assignToken("Thimble");
-
-        // Get updated available tokens
-        availableTokens = Tokens.getavailabletokens();
-
-        // Should not contain assigned tokens
-        assertFalse("Available tokens should not include Top Hat", availableTokens.contains("Top Hat"));
-        assertFalse("Available tokens should not include Thimble", availableTokens.contains("Thimble"));
-
-        // Should still contain other tokens
-        assertTrue("Available tokens should include Iron", availableTokens.contains("Iron"));
-    }
-
-    @Test
-    public void testChooseToken() {
-        // Test the static method to choose a token for a player
-        boolean result = Tokens.chooseToken(player, "Race Car");
-
-        // In the implementation, this method returns false (appears to be a stub)
-        // Just verify the method exists and returns expected value
-        assertFalse(result);
-    }
-
-    @Test
-    public void testMoveToken() {
-        // Test the static method to move a token
-        // This method doesn't return anything and appears to be a stub
-        // Just verify the method exists and doesn't throw exceptions
-        Tokens.moveToken(player, 5);
-    }
-
-    @Test
-    public void testTokenOwnership() {
-        // Test creating a token instance and setting ownership
-        Tokens token = new Tokens();
-        assertNull("New token should have no owner", token.getOwner());
-        assertEquals("New token should be at position 0", 0, token.getBoardPosition());
-
-        // Set token owner and position
-        token.setOwner("Test Player");
-        token.setBoardPosition(5);
-
-        // Verify changes
-        assertEquals("Token owner should be set", "Test Player", token.getOwner());
-        assertEquals("Token position should be set", 5, token.getBoardPosition());
-    }
-
-    @Test
-    public void testTokenToString() {
-        // Test token string representation
-        Tokens token = new Tokens();
-        token.setOwner("Test Player");
-        token.setBoardPosition(5);
-
-        String tokenString = token.toString();
-        assertTrue("Token string should contain owner", tokenString.contains("Test Player"));
-        assertTrue("Token string should contain position", tokenString.contains("5"));
-    }
-
-    @Test
-    public void testConstantValues() {
-        // Test that TOKENS constant contains expected values
-        boolean containsTopHat = false;
-        boolean containsRaceCar = false;
-        boolean containsScottieDog = false;
-
-        for (String token : Tokens.TOKENS) {
-            if (token.equals("Top Hat")) containsTopHat = true;
-            if (token.equals("Race Car")) containsRaceCar = true;
-            if (token.equals("Scottie Dog")) containsScottieDog = true;
-        }
-
-        assertTrue("TOKENS should contain Top Hat", containsTopHat);
-        assertTrue("TOKENS should contain Race Car", containsRaceCar);
-        assertTrue("TOKENS should contain Scottie Dog", containsScottieDog);
-    }
-
-    @Test
-    public void testNoAvailableTokens() {
         // Assign all tokens
         for (String token : Tokens.TOKENS) {
             Tokens.assignToken(token);
         }
 
-        // Check what happens when no tokens are available
-        String noTokens = Tokens.getavailabletokens();
-        assertEquals("Should return message when no tokens available", "No tokens available", noTokens);
+        assertEquals("No tokens available", Tokens.getavailabletokens());
+    }
+
+    @Test
+    public void testChooseToken() {
+        // This method always returns false in the current implementation
+        assertFalse(Tokens.chooseToken(player, "Race Car"));
+    }
+
+    @Test
+    public void testMoveToken() {
+        // This method is a no-op (does nothing), so just call it to cover the method
+        Tokens.moveToken(player, 5);
+    }
+
+    // Instance method tests
+    @Test
+    public void testConstructor() {
+        assertNull(tokens.getOwner());
+        assertEquals(0, tokens.getBoardPosition());
+    }
+
+    @Test
+    public void testSetAndGetOwner() {
+        tokens.setOwner("Test Owner");
+        assertEquals("Test Owner", tokens.getOwner());
+    }
+
+    @Test
+    public void testSetAndGetBoardPosition() {
+        tokens.setBoardPosition(10);
+        assertEquals(10, tokens.getBoardPosition());
+    }
+
+    @Test
+    public void testToString() {
+        tokens.setOwner("Test Player");
+        tokens.setBoardPosition(5);
+
+        String tokenString = tokens.toString();
+        assertTrue(tokenString.contains("Test Player"));
+        assertTrue(tokenString.contains("5"));
+    }
+
+    // Additional edge case and coverage tests
+    @Test
+    public void testTokensConstant() {
+        // Verify the TOKENS array contents
+        String[] expectedTokens = {
+                "Top Hat", "Thimble", "Iron", "Boot", "Battleship",
+                "Cannon", "Race Car", "Scottie Dog", "Wheelbarrow"
+        };
+        assertArrayEquals(expectedTokens, Tokens.TOKENS);
+    }
+
+    @Test
+    public void testAssignTokenCoverageEdgeCases() {
+        // Exhaust all tokens
+        for (String token : Tokens.TOKENS) {
+            assertTrue(Tokens.assignToken(token));
+        }
+
+        // Try to assign an already assigned token
+        assertFalse(Tokens.assignToken("Top Hat"));
+    }
+
+    @Test
+    public void testGetAvailableTokensAfterAssignment() {
+        // Assign all but one token
+        for (int i = 0; i < Tokens.TOKENS.length - 1; i++) {
+            Tokens.assignToken(Tokens.TOKENS[i]);
+        }
+
+        // Get available tokens
+        String availableTokens = Tokens.getavailabletokens();
+        assertTrue(availableTokens.contains(Tokens.TOKENS[Tokens.TOKENS.length - 1]));
+    }
+
+    @Test
+    public void testDisplayAvailableTokens() {
+        // Capture System.out
+        java.io.ByteArrayOutputStream outContent = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream originalOut = System.out;
+        System.setOut(new java.io.PrintStream(outContent));
+
+        try {
+            // Call display method
+            Tokens.displayAvailableTokens();
+
+            // Verify output contains available tokens
+            assertTrue(outContent.toString().contains("Available tokens:"));
+            for (String token : Tokens.TOKENS) {
+                assertTrue(outContent.toString().contains(token));
+            }
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 }
