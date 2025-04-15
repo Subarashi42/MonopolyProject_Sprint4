@@ -14,6 +14,10 @@ import Model.Board.Strategy.DefaultStrategy;
 import Model.Board.Strategy.DefensiveStrategy;
 import Model.GameState;
 
+/**
+ * Author: Ronell Washington
+ * This class represents a computer player in the game.
+ */
 
 public class ComputerPlayer extends Player {
     private ComputerPlayerStrategy strategy;
