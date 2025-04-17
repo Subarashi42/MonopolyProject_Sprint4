@@ -63,9 +63,9 @@ public class GUI extends JFrame {
     private String lastCardType = "";
 
     // Constants
-    private static final int WINDOW_WIDTH = 1200;
-    private static final int WINDOW_HEIGHT = 800;
-    private static final int BOARD_SIZE = 600;
+    private static final int WINDOW_WIDTH = 1500;
+    private static final int WINDOW_HEIGHT = 950;
+    private static final int BOARD_SIZE = 800;
     private static final int SPACE_SIZE = BOARD_SIZE / 11;
 
     /**
@@ -97,6 +97,78 @@ public class GUI extends JFrame {
         logMessage("Welcome to Monopoly! Game started with " + players.size() + " players.");
         logMessage("Current player: " + gameState.getCurrentPlayer().getName());
     }
+
+    /**
+     * Lays out the UI components
+     */
+    private void layoutUIComponents() {
+        // Set up the right side panel containing player info and actions
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(playerInfoPanel, BorderLayout.NORTH);
+
+        // Add action panel and dice panel to center right
+        JPanel centerRightPanel = new JPanel(new BorderLayout());
+        centerRightPanel.add(actionPanel, BorderLayout.NORTH);
+        centerRightPanel.add(dicePanel, BorderLayout.CENTER);
+        centerRightPanel.add(cardDisplayPanel, BorderLayout.SOUTH);
+        rightPanel.add(centerRightPanel, BorderLayout.CENTER);
+
+        // Create a panel to hold the board with some padding
+        JPanel boardContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        boardContainer.add(boardPanel);
+
+        // Create a main content panel
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(boardContainer, BorderLayout.CENTER);
+        contentPanel.add(rightPanel, BorderLayout.EAST);
+
+        // Add a small gap between board and log
+        contentPanel.add(Box.createVerticalStrut(10), BorderLayout.SOUTH);
+
+        // Create the collapsible game log
+        JPanel collapsibleLog = createCollapsibleGameLog();
+
+        // Add components to main panel
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(collapsibleLog, BorderLayout.SOUTH); // Use collapsibleLog instead of logScrollPane
+
+        // Add main panel to frame
+        setContentPane(mainPanel);
+    }
+
+    /**
+     * Creates an improved, collapsible game log
+     */
+    private JPanel createCollapsibleGameLog() {
+        JPanel logPanel = new JPanel(new BorderLayout());
+
+        // Create a toggle button to expand/collapse the log
+        JButton toggleButton = new JButton("Game Log ▲");
+        toggleButton.setPreferredSize(new Dimension(WINDOW_WIDTH, 25));
+
+        // Create the log area
+        gameLog = new JTextArea(5, 40);
+        gameLog.setEditable(false);
+        logScrollPane = new JScrollPane(gameLog);
+
+        // Add to panel
+        logPanel.add(toggleButton, BorderLayout.NORTH);
+        logPanel.add(logScrollPane, BorderLayout.CENTER);
+
+        // Add action to toggle visibility
+        final boolean[] isExpanded = {true};
+        toggleButton.addActionListener(e -> {
+            isExpanded[0] = !isExpanded[0];
+            logScrollPane.setVisible(isExpanded[0]);
+            toggleButton.setText("Game Log " + (isExpanded[0] ? "▲" : "▼"));
+            logPanel.revalidate();
+            logPanel.repaint();
+        });
+
+        return logPanel;
+    }
+
+
 
     /**
      * Sets up the game components
@@ -259,39 +331,12 @@ public class GUI extends JFrame {
         // Create card display panel
         cardDisplayPanel = createCardDisplayPanel();
 
-        // Create game log
-        gameLog = new JTextArea(10, 40);
+        // Create game log with smaller height
+        gameLog = new JTextArea(5, 40);  // Reduced from 10 rows to 5
         gameLog.setEditable(false);
         logScrollPane = new JScrollPane(gameLog);
         logScrollPane.setBorder(new TitledBorder("Game Log"));
-    }
-
-    /**
-     * Lays out the UI components
-     */
-    private void layoutUIComponents() {
-        // Set up the right side panel containing player info and actions
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(playerInfoPanel, BorderLayout.NORTH);
-
-        // Add action panel and dice panel to center right
-        JPanel centerRightPanel = new JPanel(new BorderLayout());
-        centerRightPanel.add(actionPanel, BorderLayout.NORTH);
-        centerRightPanel.add(dicePanel, BorderLayout.CENTER);
-        centerRightPanel.add(cardDisplayPanel, BorderLayout.SOUTH);
-        rightPanel.add(centerRightPanel, BorderLayout.CENTER);
-
-        // Create a panel to hold the board with some padding
-        JPanel boardContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        boardContainer.add(boardPanel);
-
-        // Add components to main panel
-        mainPanel.add(boardContainer, BorderLayout.CENTER);
-        mainPanel.add(rightPanel, BorderLayout.EAST);
-        mainPanel.add(logScrollPane, BorderLayout.SOUTH);
-
-        // Add main panel to frame
-        setContentPane(mainPanel);
+        logScrollPane.setPreferredSize(new Dimension(WINDOW_WIDTH, 100)); // Set fixed height of 100 pixels
     }
 
     /**
@@ -1334,7 +1379,7 @@ public class GUI extends JFrame {
                 new Color(0, 102, 153)     // Railroads/Utilities - Blue
         };
 
-       // Image fields
+        // Image fields
         private Image houseImage;
         private Image hotelImage;
 
@@ -1367,6 +1412,7 @@ public class GUI extends JFrame {
         /**
          * Author: Marena
          * Paints the board and its components
+         *
          * @param g the <code>Graphics</code> object to protect
          */
 
@@ -1431,19 +1477,19 @@ public class GUI extends JFrame {
             g2d.fillRect(BOARD_SIZE - SPACE_SIZE, BOARD_SIZE - SPACE_SIZE, SPACE_SIZE, SPACE_SIZE);
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 16));
-            drawRotatedText(g2d, "GO", BOARD_SIZE - SPACE_SIZE/2, BOARD_SIZE - SPACE_SIZE/2, 45);
+            drawRotatedText(g2d, "GO", BOARD_SIZE - SPACE_SIZE / 2, BOARD_SIZE - SPACE_SIZE / 2, 45);
 
             // JAIL (Bottom left corner) - Position 10
             g2d.setColor(new Color(235, 235, 235)); // Light gray
             g2d.fillRect(0, BOARD_SIZE - SPACE_SIZE, SPACE_SIZE, SPACE_SIZE);
             // Draw jail cell
             g2d.setColor(Color.ORANGE);
-            g2d.fillRect(5, BOARD_SIZE - SPACE_SIZE + 5, SPACE_SIZE - 10, SPACE_SIZE/2 - 5);
+            g2d.fillRect(5, BOARD_SIZE - SPACE_SIZE + 5, SPACE_SIZE - 10, SPACE_SIZE / 2 - 5);
             g2d.setColor(Color.BLACK);
-            g2d.drawRect(5, BOARD_SIZE - SPACE_SIZE + 5, SPACE_SIZE - 10, SPACE_SIZE/2 - 5);
+            g2d.drawRect(5, BOARD_SIZE - SPACE_SIZE + 5, SPACE_SIZE - 10, SPACE_SIZE / 2 - 5);
             // Add text
             g2d.setFont(new Font("Arial", Font.BOLD, 10));
-            g2d.drawString("JAIL", 10, BOARD_SIZE - SPACE_SIZE/2);
+            g2d.drawString("JAIL", 10, BOARD_SIZE - SPACE_SIZE / 2);
             g2d.drawString("Just Visiting", 5, BOARD_SIZE - 10);
 
             // FREE PARKING (Top left corner) - Position 20
@@ -1466,6 +1512,7 @@ public class GUI extends JFrame {
         /**
          * Author: Aiden Clare
          * Draws the houses and hotels on properties
+         *
          * @param g2d
          * @param property
          * @param x
@@ -1477,35 +1524,37 @@ public class GUI extends JFrame {
             if (property.getHouses() == 0) return;
 
             int houseCount = property.getHouses();
-            boolean isHotel = houseCount == 5; // Assuming 5 houses = 1 hotel
+            boolean isHotel = property.hasHotel();
 
             if (isHotel) {
                 // Draw hotel
                 if (hotelImage != null) {
-                    g2d.drawImage(hotelImage, x + spaceWidth/2 - 10, y + spaceHeight - 30, null);
+                    // Scale the image based on the new board size
+                    g2d.drawImage(hotelImage, x + spaceWidth / 2 - 14, y + spaceHeight - 40, 28, 28, null);
                 } else {
                     // Fallback drawing
                     g2d.setColor(Color.RED);
-                    g2d.fillRect(x + spaceWidth/2 - 10, y + spaceHeight - 30, 20, 20);
+                    g2d.fillRect(x + spaceWidth / 2 - 14, y + spaceHeight - 40, 28, 28);
                     g2d.setColor(Color.WHITE);
-                    g2d.drawString("H", x + spaceWidth/2 - 5, y + spaceHeight - 15);
+                    g2d.drawString("H", x + spaceWidth / 2 - 7, y + spaceHeight - 20);
                 }
             } else {
                 // Draw houses
-                int houseSize = 15;
+                int houseSize = 20; // Increased from 15
                 int startX = x + (spaceWidth - (houseCount * houseSize)) / 2;
 
                 for (int i = 0; i < houseCount; i++) {
                     if (houseImage != null) {
-                        g2d.drawImage(houseImage, startX + i * houseSize, y + spaceHeight - 30, null);
+                        g2d.drawImage(houseImage, startX + i * houseSize, y + spaceHeight - 40, houseSize, houseSize, null);
                     } else {
                         // Fallback drawing
                         g2d.setColor(Color.GREEN);
-                        g2d.fillRect(startX + i * houseSize, y + spaceHeight - 30, houseSize-2, houseSize-2);
+                        g2d.fillRect(startX + i * houseSize, y + spaceHeight - 40, houseSize - 2, houseSize - 2);
                     }
                 }
             }
         }
+
         private void drawSideSpaces(Graphics2D g2d) {
             // Set a thicker stroke for better visibility of space borders
             Stroke originalStroke = g2d.getStroke();
@@ -1565,15 +1614,16 @@ public class GUI extends JFrame {
 
         /**
          * Helper method to draw a space with its content (color band, name, owner, houses)
-         * @param g2d Graphics context
-         * @param space The space to draw
-         * @param x X position
-         * @param y Y position
-         * @param width Width of the space
-         * @param height Height of the space
-         * @param nameFont Font for the space name
+         *
+         * @param g2d       Graphics context
+         * @param space     The space to draw
+         * @param x         X position
+         * @param y         Y position
+         * @param width     Width of the space
+         * @param height    Height of the space
+         * @param nameFont  Font for the space name
          * @param ownerFont Font for the owner name
-         * @param rotation Rotation angle in degrees (0, 90, 180, 270)
+         * @param rotation  Rotation angle in degrees (0, 90, 180, 270)
          */
         private void drawSpaceWithContent(Graphics2D g2d, Space space, int x, int y, int width, int height,
                                           Font nameFont, Font ownerFont, int rotation) {
@@ -1593,9 +1643,9 @@ public class GUI extends JFrame {
             drawSpaceNameWithRotation(g2d, space.getName(), x, y, width, height, nameFont, rotation);
 
             // Draw owner and houses/hotels if applicable
-            if ((space instanceof Property && ((Property)space).isOwned()) ||
-                    (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
-                    (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
+            if ((space instanceof Property && ((Property) space).isOwned()) ||
+                    (space instanceof RailroadSpace && ((RailroadSpace) space).isOwned()) ||
+                    (space instanceof UtilitySpace && ((UtilitySpace) space).isOwned())) {
 
                 Player owner = space.getOwner();
                 if (owner != null) {
@@ -1670,28 +1720,28 @@ public class GUI extends JFrame {
             AffineTransform originalTransform = g2d.getTransform();
 
             // Calculate center of space
-            int centerX = x + width/2;
-            int centerY = y + height/2;
+            int centerX = x + width / 2;
+            int centerY = y + height / 2;
 
             if (rotation == 0) {
                 // Bottom row - normal text
                 drawWrappedText(g2d, name, x + 3, y + 15, width - 6);
             } else if (rotation == 90) {
                 // Left column - rotate 90° clockwise
-                g2d.rotate(Math.PI/2, centerX, centerY);
+                g2d.rotate(Math.PI / 2, centerX, centerY);
                 FontMetrics fm = g2d.getFontMetrics();
                 int textWidth = fm.stringWidth(name);
-                g2d.drawString(name, centerX - textWidth/2, centerY + 3);
+                g2d.drawString(name, centerX - textWidth / 2, centerY + 3);
             } else if (rotation == 180) {
-                // Top row - rotate 180°
-                g2d.rotate(Math.PI, centerX, centerY);
-                drawWrappedText(g2d, name, x + 3, y + 15, width - 6);
+                // Top row - need to fix upside down text
+                // Instead of using full 180° rotation, we'll draw text normally but position it correctly
+                drawWrappedText(g2d, name, x + 3, y + height - 15, width - 6);
             } else if (rotation == 270) {
                 // Right column - rotate 270° clockwise (90° counter-clockwise)
-                g2d.rotate(-Math.PI/2, centerX, centerY);
+                g2d.rotate(-Math.PI / 2, centerX, centerY);
                 FontMetrics fm = g2d.getFontMetrics();
                 int textWidth = fm.stringWidth(name);
-                g2d.drawString(name, centerX - textWidth/2, centerY + 3);
+                g2d.drawString(name, centerX - textWidth / 2, centerY + 3);
             }
 
             // Restore transform
@@ -1710,8 +1760,8 @@ public class GUI extends JFrame {
             AffineTransform originalTransform = g2d.getTransform();
 
             // Calculate center of space
-            int centerX = x + width/2;
-            int centerY = y + height/2;
+            int centerX = x + width / 2;
+            int centerY = y + height / 2;
 
             String text = "Owner: " + ownerName;
 
@@ -1720,7 +1770,7 @@ public class GUI extends JFrame {
                 drawCenteredString(g2d, text, x, y + height - 5, width);
             } else if (rotation == 90) {
                 // Left column
-                g2d.rotate(Math.PI/2, x + width - 8, centerY);
+                g2d.rotate(Math.PI / 2, x + width - 8, centerY);
                 g2d.drawString(text, x + width - 8, centerY);
             } else if (rotation == 180) {
                 // Top row
@@ -1728,7 +1778,7 @@ public class GUI extends JFrame {
                 drawCenteredString(g2d, text, x, y + 10, width);
             } else if (rotation == 270) {
                 // Right column
-                g2d.rotate(-Math.PI/2, x + 8, centerY);
+                g2d.rotate(-Math.PI / 2, x + 8, centerY);
                 g2d.drawString(text, x + 8, centerY);
             }
 
@@ -1744,8 +1794,8 @@ public class GUI extends JFrame {
             AffineTransform originalTransform = g2d.getTransform();
 
             // Rotate to match space orientation
-            int centerX = x + width/2;
-            int centerY = y + height/2;
+            int centerX = x + width / 2;
+            int centerY = y + height / 2;
             g2d.rotate(Math.toRadians(rotation), centerX, centerY);
 
             int houseCount = property.getHouses();
@@ -1754,13 +1804,13 @@ public class GUI extends JFrame {
             if (hasHotel) {
                 // Draw hotel
                 if (hotelImage != null) {
-                    g2d.drawImage(hotelImage, x + width/2 - 10, y + 20, null);
+                    g2d.drawImage(hotelImage, x + width / 2 - 10, y + 20, null);
                 } else {
                     // Fallback drawing
                     g2d.setColor(Color.RED);
-                    g2d.fillRect(x + width/2 - 10, y + 20, 20, 20);
+                    g2d.fillRect(x + width / 2 - 10, y + 20, 20, 20);
                     g2d.setColor(Color.WHITE);
-                    g2d.drawString("H", x + width/2 - 5, y + 35);
+                    g2d.drawString("H", x + width / 2 - 5, y + 35);
                 }
             } else if (houseCount > 0) {
                 // Draw houses
@@ -1773,7 +1823,7 @@ public class GUI extends JFrame {
                     } else {
                         // Fallback drawing
                         g2d.setColor(Color.GREEN);
-                        g2d.fillRect(startX + i * houseSize, y + 20, houseSize-2, houseSize-2);
+                        g2d.fillRect(startX + i * houseSize, y + 20, houseSize - 2, houseSize - 2);
                     }
                 }
             }
@@ -1853,32 +1903,6 @@ public class GUI extends JFrame {
         }
 
 
-
-        /**
-         * Author: Marena
-         * Helper method to draw text for top row spaces with better visibility - simplified version
-         */
-        private void drawTopRowText(Graphics2D g2d, String text, int x, int y) {
-            // Save original transform
-            AffineTransform originalTransform = g2d.getTransform();
-
-            // Rotate 180 degrees for top row
-            g2d.rotate(Math.PI, x, y);
-
-            // Get font metrics for centering
-            FontMetrics fm = g2d.getFontMetrics();
-            int textWidth = fm.stringWidth(text);
-
-            // Draw the text centered
-            g2d.drawString(text, x - textWidth/2, y);
-
-            // Restore original transform
-            g2d.setTransform(originalTransform);
-        }
-
-
-
-
         /**
          * Author: Marena
          * Draws the central Monopoly logo
@@ -1927,14 +1951,14 @@ public class GUI extends JFrame {
             // Create diamond shape
             int[] xPoints = {
                     x,
-                    x + cardSize/2,
+                    x + cardSize / 2,
                     x + cardSize,
-                    x + cardSize/2
+                    x + cardSize / 2
             };
             int[] yPoints = {
-                    y + cardSize/2,
+                    y + cardSize / 2,
                     y,
-                    y + cardSize/2,
+                    y + cardSize / 2,
                     y + cardSize
             };
 
@@ -1958,13 +1982,13 @@ public class GUI extends JFrame {
 
                 for (int i = 0; i < parts.length; i++) {
                     int textWidth = fm.stringWidth(parts[i]);
-                    g2d.drawString(parts[i], x + cardSize/2 - textWidth/2,
-                            y + cardSize/2 + i*15);
+                    g2d.drawString(parts[i], x + cardSize / 2 - textWidth / 2,
+                            y + cardSize / 2 + i * 15);
                 }
             } else {
                 FontMetrics fm = g2d.getFontMetrics();
                 int textWidth = fm.stringWidth(text);
-                g2d.drawString(text, x + cardSize/2 - textWidth/2, y + cardSize/2);
+                g2d.drawString(text, x + cardSize / 2 - textWidth / 2, y + cardSize / 2);
             }
         }
 
@@ -2104,15 +2128,24 @@ public class GUI extends JFrame {
             if (colorGroup == null) return 0;
 
             switch (colorGroup.toLowerCase()) {
-                case "brown": return 0;
-                case "light blue": return 1;
-                case "pink": return 2;
-                case "orange": return 3;
-                case "red": return 4;
-                case "yellow": return 5;
-                case "green": return 6;
-                case "dark blue": return 7;
-                default: return 0;
+                case "brown":
+                    return 0;
+                case "light blue":
+                    return 1;
+                case "pink":
+                    return 2;
+                case "orange":
+                    return 3;
+                case "red":
+                    return 4;
+                case "yellow":
+                    return 5;
+                case "green":
+                    return 6;
+                case "dark blue":
+                    return 7;
+                default:
+                    return 0;
             }
         }
 
@@ -2136,30 +2169,6 @@ public class GUI extends JFrame {
             double angleRadians = Math.toRadians(angleDegrees);
             g2d.rotate(angleRadians, x, y);
             g2d.drawString(text, x, y);
-
-            g2d.setTransform(originalTransform);
-        }
-
-        /**
-         * Author: Marena
-         * Draws rotated and centered text
-         */
-        private void drawRotatedCenteredString(Graphics2D g2d, String text, int x, int y, int width, double angleDegrees) {
-            AffineTransform originalTransform = g2d.getTransform();
-
-            FontMetrics fm = g2d.getFontMetrics();
-            int textWidth = fm.stringWidth(text);
-            double angleRadians = Math.toRadians(angleDegrees);
-
-            g2d.rotate(angleRadians, x, y);
-
-            if (angleDegrees == 90 || angleDegrees == 270) {
-                // For vertical text
-                g2d.drawString(text, x - fm.getAscent() / 2, y + textWidth / 2);
-            } else {
-                // For horizontal or diagonal text
-                g2d.drawString(text, x - textWidth / 2, y);
-            }
 
             g2d.setTransform(originalTransform);
         }
