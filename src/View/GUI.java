@@ -1425,19 +1425,15 @@ public class GUI extends JFrame {
         }
 
 
-        /**
-         * Author: Marena
-         * Draws the corner spaces (GO, Jail, Free Parking, Go To Jail)
-         */
         private void drawCornerSpaces(Graphics2D g2d) {
-            // GO (Bottom right)
+            // GO (Bottom right corner) - Position 0
             g2d.setColor(new Color(255, 240, 245)); // Light pink background
             g2d.fillRect(BOARD_SIZE - SPACE_SIZE, BOARD_SIZE - SPACE_SIZE, SPACE_SIZE, SPACE_SIZE);
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 16));
             drawRotatedText(g2d, "GO", BOARD_SIZE - SPACE_SIZE/2, BOARD_SIZE - SPACE_SIZE/2, 45);
 
-            // Just Visiting / Jail (Bottom left)
+            // JAIL (Bottom left corner) - Position 10
             g2d.setColor(new Color(235, 235, 235)); // Light gray
             g2d.fillRect(0, BOARD_SIZE - SPACE_SIZE, SPACE_SIZE, SPACE_SIZE);
             // Draw jail cell
@@ -1450,7 +1446,7 @@ public class GUI extends JFrame {
             g2d.drawString("JAIL", 10, BOARD_SIZE - SPACE_SIZE/2);
             g2d.drawString("Just Visiting", 5, BOARD_SIZE - 10);
 
-            // Free Parking (Top left)
+            // FREE PARKING (Top left corner) - Position 20
             g2d.setColor(new Color(235, 235, 235)); // Light gray
             g2d.fillRect(0, 0, SPACE_SIZE, SPACE_SIZE);
             g2d.setColor(Color.RED);
@@ -1458,7 +1454,7 @@ public class GUI extends JFrame {
             g2d.drawString("FREE", 10, 20);
             g2d.drawString("PARKING", 5, 40);
 
-            // Go To Jail (Top right)
+            // GO TO JAIL (Top right corner) - Position 30
             g2d.setColor(new Color(235, 235, 235)); // Light gray
             g2d.fillRect(BOARD_SIZE - SPACE_SIZE, 0, SPACE_SIZE, SPACE_SIZE);
             g2d.setColor(Color.BLUE);
@@ -1510,340 +1506,280 @@ public class GUI extends JFrame {
                 }
             }
         }
-        /**
-         * Author: Marena
-         * Edited by: Aiden Clare
-         * Draws the side spaces (properties, utilities, railroads, etc.) with improved text spacing
-         */
         private void drawSideSpaces(Graphics2D g2d) {
             // Set a thicker stroke for better visibility of space borders
             Stroke originalStroke = g2d.getStroke();
             g2d.setStroke(new BasicStroke(1.5f));
 
-
             // Create a smaller font for property names to avoid text overlap
             Font smallFont = new Font("Arial", Font.PLAIN, 6);
             Font ownerFont = new Font("Arial", Font.BOLD, 6);
 
-            // Bottom row (left to right, excluding corners)
-            for (int i = 1; i < 10; i++) {
-                int x = SPACE_SIZE * i;
+            // Bottom row (left to right from jail to GO, positions 1-9)
+            for (int i = 1; i <= 9; i++) {
+                int x = BOARD_SIZE - SPACE_SIZE * (i + 1);
                 int y = BOARD_SIZE - SPACE_SIZE;
 
-                // Get the corresponding space from the board
-                Space space = board.getspace((i + 30) % 40); // Bottom row spaces
+                // Get the space from the Gameboard
+                Space space = board.getspace(i);
 
-                // Fill space background with a border
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(x, y, SPACE_SIZE, SPACE_SIZE);
-                g2d.setColor(Color.BLACK);
-                g2d.drawRect(x, y, SPACE_SIZE, SPACE_SIZE);
-
-                // Draw property band if it's a property
-                if (space instanceof Property) {
-                    Property property = (Property) space;
-                    int colorIndex = getColorIndex(property.getColorGroup());
-                    g2d.setColor(PROPERTY_COLORS[colorIndex]);
-                    g2d.fillRect(x, y, SPACE_SIZE, 10); // Smaller colored band
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, SPACE_SIZE, 10); // Add border to color band
-                } else if (space instanceof RailroadSpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, SPACE_SIZE, 10);
-                } else if (space instanceof UtilitySpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, SPACE_SIZE, 10);
-                } else {
-                    // Special spaces
-                    g2d.setColor(SPECIAL_COLORS[i % SPECIAL_COLORS.length]);
-                    g2d.fillRect(x, y, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, SPACE_SIZE, 10);
-                }
-
-                // Draw space name with better wrapping
-                g2d.setColor(Color.BLACK);
-                g2d.setFont(smallFont);
-                drawWrappedText(g2d, space.getName(), x + 3, y + 20, SPACE_SIZE - 6);
-
-                // If property is owned, show owner
-                if ((space instanceof Property && ((Property)space).isOwned()) ||
-                        (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
-                        (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
-
-                    Player owner = space.getOwner();
-                    if (owner != null) {
-                        g2d.setColor(Color.RED);
-                        g2d.setFont(ownerFont);
-                        drawCenteredString(g2d, "Owner: " + owner.getName(), x, y + SPACE_SIZE - 5, SPACE_SIZE);
-
-                        if (space instanceof Property) {
-                            Property property = (Property) space;
-                            if (property.isOwned()) {
-                                drawHouses(g2d, property, x, y - 15, SPACE_SIZE, SPACE_SIZE);
-                            }
-                        }
-                    }
-                }
+                drawSpaceWithContent(g2d, space, x, y, SPACE_SIZE, SPACE_SIZE, smallFont, ownerFont, 0);
             }
 
-            // Left column (bottom to top, excluding corners)
-            for (int i = 1; i < 10; i++) {
+            // Left column (bottom to top, positions 11-19)
+            for (int i = 1; i <= 9; i++) {
                 int x = 0;
                 int y = BOARD_SIZE - SPACE_SIZE * (i + 1);
 
-                // Get the corresponding space from the board
-                Space space = board.getspace(20 + i); // Left column spaces
+                // Get the space from the Gameboard
+                Space space = board.getspace(10 + i);
 
-                // Fill space background
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(x, y, SPACE_SIZE, SPACE_SIZE);
-                g2d.setColor(Color.BLACK);
-                g2d.drawRect(x, y, SPACE_SIZE, SPACE_SIZE);
-
-                // Draw property band if it's a property
-                if (space instanceof Property) {
-                    Property property = (Property) space;
-                    int colorIndex = getColorIndex(property.getColorGroup());
-                    g2d.setColor(PROPERTY_COLORS[colorIndex]);
-                    g2d.fillRect(x, y, 10, SPACE_SIZE); // Smaller colored band
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, 10, SPACE_SIZE);
-                } else if (space instanceof RailroadSpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, 10, SPACE_SIZE);
-                } else if (space instanceof UtilitySpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, 10, SPACE_SIZE);
-                } else {
-                    // Special spaces
-                    g2d.setColor(SPECIAL_COLORS[i % SPECIAL_COLORS.length]);
-                    g2d.fillRect(x, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y, 10, SPACE_SIZE);
-                }
-
-                // Draw space name - SIMPLIFIED VERSION
-                g2d.setColor(Color.BLACK);
-                g2d.setFont(smallFont);
-
-                // Save original transform
-                AffineTransform originalTransform = g2d.getTransform();
-
-                // Draw in center of space, rotated 90 degrees
-                int centerX = x + SPACE_SIZE/2;
-                int centerY = y + SPACE_SIZE/2;
-
-                // Rotate text
-                g2d.rotate(Math.PI/2, centerX, centerY);
-
-                // Draw centered text
-                FontMetrics fm = g2d.getFontMetrics();
-                int textWidth = fm.stringWidth(space.getName());
-                g2d.drawString(space.getName(), centerX - textWidth/2, centerY + 3);
-
-                // Restore transform
-                g2d.setTransform(originalTransform);
-
-                // If property is owned, show owner
-                if ((space instanceof Property && ((Property)space).isOwned()) ||
-                        (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
-                        (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
-
-                    Player owner = space.getOwner();
-                    if (owner != null) {
-                        g2d.setColor(Color.RED);
-                        g2d.setFont(ownerFont);
-
-                        // Draw owner name with rotation
-                        g2d.rotate(Math.PI/2, x + SPACE_SIZE - 8, y + SPACE_SIZE/2);
-                        g2d.drawString("Owner: " + owner.getName(), x + SPACE_SIZE - 8, y + SPACE_SIZE/2);
-                        g2d.rotate(-Math.PI/2, x + SPACE_SIZE - 8, y + SPACE_SIZE/2);
-
-                        if (space instanceof Property) {
-                            Property property = (Property) space;
-                            if (property.isOwned()) {
-                                AffineTransform original = g2d.getTransform();
-                                g2d.rotate(Math.PI/2, x + SPACE_SIZE/2, y + SPACE_SIZE/2);
-                                drawHouses(g2d, property, x, y, SPACE_SIZE, SPACE_SIZE);
-                                g2d.setTransform(original);
-                            }
-                        }
-                    }
-                }
+                drawSpaceWithContent(g2d, space, x, y, SPACE_SIZE, SPACE_SIZE, smallFont, ownerFont, 90);
             }
 
-            // Top row (right to left, excluding corners)
-            for (int i = 1; i < 10; i++) {
-                int x = BOARD_SIZE - SPACE_SIZE * (i + 1);
+            // Top row (left to right, positions 21-29)
+            for (int i = 1; i <= 9; i++) {
+                int x = SPACE_SIZE * i;
                 int y = 0;
 
-                // Get the corresponding space from the board
-                Space space = board.getspace(20 - i); // Top row spaces
+                // Get the space from the Gameboard
+                Space space = board.getspace(20 + i);
 
-                // Fill space background
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(x, y, SPACE_SIZE, SPACE_SIZE);
-                g2d.setColor(Color.BLACK);
-                g2d.drawRect(x, y, SPACE_SIZE, SPACE_SIZE);
-
-                // Draw property band if it's a property
-                if (space instanceof Property) {
-                    Property property = (Property) space;
-                    int colorIndex = getColorIndex(property.getColorGroup());
-                    g2d.setColor(PROPERTY_COLORS[colorIndex]);
-                    g2d.fillRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10); // Colored band at bottom
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                } else if (space instanceof RailroadSpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                } else if (space instanceof UtilitySpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                } else {
-                    // Special spaces
-                    g2d.setColor(SPECIAL_COLORS[i % SPECIAL_COLORS.length]);
-                    g2d.fillRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x, y + SPACE_SIZE - 10, SPACE_SIZE, 10);
-                }
-
-                // Draw space name upside down
-                g2d.setColor(Color.BLACK);
-                g2d.setFont(smallFont);
-                drawTopRowText(g2d, space.getName(), x + SPACE_SIZE/2, y + 20);
-
-                // If property is owned, show owner
-                if ((space instanceof Property && ((Property)space).isOwned()) ||
-                        (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
-                        (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
-
-                    Player owner = space.getOwner();
-                    if (owner != null) {
-                        g2d.setColor(Color.RED);
-                        g2d.setFont(ownerFont);
-                        g2d.rotate(Math.PI, x + SPACE_SIZE/2, y + 10);
-                        drawCenteredString(g2d, "Owner: " + owner.getName(), x, y + 10, SPACE_SIZE);
-                        g2d.rotate(-Math.PI, x + SPACE_SIZE/2, y + 10);
-                        if (space instanceof Property) {
-                            Property property = (Property) space;
-                            if (property.isOwned()) {
-                                AffineTransform original = g2d.getTransform();
-                                g2d.rotate(Math.PI, x + SPACE_SIZE/2, y + SPACE_SIZE/2);
-                                drawHouses(g2d, property, x, y, SPACE_SIZE, SPACE_SIZE);
-                                g2d.setTransform(original);
-                            }
-                        }
-                    }
-                }
+                drawSpaceWithContent(g2d, space, x, y, SPACE_SIZE, SPACE_SIZE, smallFont, ownerFont, 180);
             }
 
-            // Right column (top to bottom, excluding corners)
-            for (int i = 1; i < 10; i++) {
+            // Right column (top to bottom, positions 31-39)
+            for (int i = 1; i <= 9; i++) {
                 int x = BOARD_SIZE - SPACE_SIZE;
                 int y = SPACE_SIZE * i;
 
-                // Get the corresponding space from the board
-                Space space = board.getspace(i); // Right column spaces
+                // Get the space from the Gameboard
+                Space space = board.getspace(30 + i);
 
-                // Fill space background
-                g2d.setColor(Color.WHITE);
-                g2d.fillRect(x, y, SPACE_SIZE, SPACE_SIZE);
-                g2d.setColor(Color.BLACK);
-                g2d.drawRect(x, y, SPACE_SIZE, SPACE_SIZE);
-
-                // Draw property band if it's a property
-                if (space instanceof Property) {
-                    Property property = (Property) space;
-                    int colorIndex = getColorIndex(property.getColorGroup());
-                    g2d.setColor(PROPERTY_COLORS[colorIndex]);
-                    g2d.fillRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE); // Colored band on right
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                } else if (space instanceof RailroadSpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                } else if (space instanceof UtilitySpace) {
-                    g2d.setColor(SPECIAL_COLORS[3]);
-                    g2d.fillRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                } else {
-                    // Special spaces
-                    g2d.setColor(SPECIAL_COLORS[i % SPECIAL_COLORS.length]);
-                    g2d.fillRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(x + SPACE_SIZE - 10, y, 10, SPACE_SIZE);
-                }
-
-                // Draw space name - SIMPLIFIED VERSION
-                g2d.setColor(Color.BLACK);
-                g2d.setFont(smallFont);
-
-                // Save original transform
-                AffineTransform originalTransform = g2d.getTransform();
-
-                // Draw in center of space, rotated -90 degrees
-                int centerX = x + SPACE_SIZE/2;
-                int centerY = y + SPACE_SIZE/2;
-
-                // Rotate text
-                g2d.rotate(-Math.PI/2, centerX, centerY);
-
-                // Draw centered text
-                FontMetrics fm = g2d.getFontMetrics();
-                int textWidth = fm.stringWidth(space.getName());
-                g2d.drawString(space.getName(), centerX - textWidth/2, centerY + 3);
-
-                // Restore transform
-                g2d.setTransform(originalTransform);
-
-                // If property is owned, show owner
-                if ((space instanceof Property && ((Property)space).isOwned()) ||
-                        (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
-                        (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
-
-                    Player owner = space.getOwner();
-                    if (owner != null) {
-                        g2d.setColor(Color.RED);
-                        g2d.setFont(ownerFont);
-
-                        // Draw owner name with rotation
-                        g2d.rotate(-Math.PI/2, x + 8, y + SPACE_SIZE/2);
-                        String ownerText = "Owner: " + owner.getName();
-                        int ownerWidth = g2d.getFontMetrics().stringWidth(ownerText);
-                        g2d.drawString(ownerText, x + 8 - ownerWidth/2, y + SPACE_SIZE/2);
-                        g2d.rotate(Math.PI/2, x + 8, y + SPACE_SIZE/2);
-                        if (space instanceof Property) {
-                            Property property = (Property) space;
-                            if (property.isOwned()) {
-                                AffineTransform original = g2d.getTransform();
-                                g2d.rotate(-Math.PI/2, x + SPACE_SIZE/2, y + SPACE_SIZE/2);
-                                drawHouses(g2d, property, x, y, SPACE_SIZE, SPACE_SIZE);
-                                g2d.setTransform(original);
-                            }
-                        }
-                    }
-                }
+                drawSpaceWithContent(g2d, space, x, y, SPACE_SIZE, SPACE_SIZE, smallFont, ownerFont, 270);
             }
 
             // Restore original stroke
             g2d.setStroke(originalStroke);
+        }
+
+        /**
+         * Helper method to draw a space with its content (color band, name, owner, houses)
+         * @param g2d Graphics context
+         * @param space The space to draw
+         * @param x X position
+         * @param y Y position
+         * @param width Width of the space
+         * @param height Height of the space
+         * @param nameFont Font for the space name
+         * @param ownerFont Font for the owner name
+         * @param rotation Rotation angle in degrees (0, 90, 180, 270)
+         */
+        private void drawSpaceWithContent(Graphics2D g2d, Space space, int x, int y, int width, int height,
+                                          Font nameFont, Font ownerFont, int rotation) {
+            // Save original transform
+            AffineTransform originalTransform = g2d.getTransform();
+
+            // Fill space background
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(x, y, width, height);
+            g2d.setColor(Color.BLACK);
+            g2d.drawRect(x, y, width, height);
+
+            // Draw color band based on space type
+            drawSpaceColorBand(g2d, space, x, y, width, height, rotation);
+
+            // Draw space name with appropriate rotation
+            drawSpaceNameWithRotation(g2d, space.getName(), x, y, width, height, nameFont, rotation);
+
+            // Draw owner and houses/hotels if applicable
+            if ((space instanceof Property && ((Property)space).isOwned()) ||
+                    (space instanceof RailroadSpace && ((RailroadSpace)space).isOwned()) ||
+                    (space instanceof UtilitySpace && ((UtilitySpace)space).isOwned())) {
+
+                Player owner = space.getOwner();
+                if (owner != null) {
+                    drawSpaceOwner(g2d, owner.getName(), x, y, width, height, ownerFont, rotation);
+
+                    if (space instanceof Property) {
+                        Property property = (Property) space;
+                        if (property.getHouses() > 0 || property.hasHotel()) {
+                            drawSpaceHouses(g2d, property, x, y, width, height, rotation);
+                        }
+                    }
+                }
+            }
+
+            // Restore original transform
+            g2d.setTransform(originalTransform);
+        }
+
+        /**
+         * Draws the color band at the top of a space
+         */
+        private void drawSpaceColorBand(Graphics2D g2d, Space space, int x, int y, int width, int height, int rotation) {
+            int bandHeight = 10;
+            Color bandColor = null;
+
+            // Determine band color based on space type
+            if (space instanceof Property) {
+                Property property = (Property) space;
+                int colorIndex = getColorIndex(property.getColorGroup());
+                bandColor = PROPERTY_COLORS[colorIndex];
+            } else if (space instanceof RailroadSpace || space instanceof UtilitySpace) {
+                bandColor = SPECIAL_COLORS[3]; // Railroad/Utility color
+            } else {
+                bandColor = SPECIAL_COLORS[space.getPosition() % SPECIAL_COLORS.length]; // Special space color
+            }
+
+            g2d.setColor(bandColor);
+
+            // Draw band at appropriate position based on rotation
+            if (rotation == 0) {
+                // Bottom row - band at top
+                g2d.fillRect(x, y, width, bandHeight);
+                g2d.setColor(Color.BLACK);
+                g2d.drawRect(x, y, width, bandHeight);
+            } else if (rotation == 90) {
+                // Left column - band at right
+                g2d.fillRect(x, y, bandHeight, height);
+                g2d.setColor(Color.BLACK);
+                g2d.drawRect(x, y, bandHeight, height);
+            } else if (rotation == 180) {
+                // Top row - band at bottom
+                g2d.fillRect(x, y + height - bandHeight, width, bandHeight);
+                g2d.setColor(Color.BLACK);
+                g2d.drawRect(x, y + height - bandHeight, width, bandHeight);
+            } else if (rotation == 270) {
+                // Right column - band at left
+                g2d.fillRect(x + width - bandHeight, y, bandHeight, height);
+                g2d.setColor(Color.BLACK);
+                g2d.drawRect(x + width - bandHeight, y, bandHeight, height);
+            }
+        }
+
+        /**
+         * Draws the space name with appropriate rotation
+         */
+        private void drawSpaceNameWithRotation(Graphics2D g2d, String name, int x, int y, int width, int height,
+                                               Font font, int rotation) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(font);
+
+            // Save original transform
+            AffineTransform originalTransform = g2d.getTransform();
+
+            // Calculate center of space
+            int centerX = x + width/2;
+            int centerY = y + height/2;
+
+            if (rotation == 0) {
+                // Bottom row - normal text
+                drawWrappedText(g2d, name, x + 3, y + 15, width - 6);
+            } else if (rotation == 90) {
+                // Left column - rotate 90° clockwise
+                g2d.rotate(Math.PI/2, centerX, centerY);
+                FontMetrics fm = g2d.getFontMetrics();
+                int textWidth = fm.stringWidth(name);
+                g2d.drawString(name, centerX - textWidth/2, centerY + 3);
+            } else if (rotation == 180) {
+                // Top row - rotate 180°
+                g2d.rotate(Math.PI, centerX, centerY);
+                drawWrappedText(g2d, name, x + 3, y + 15, width - 6);
+            } else if (rotation == 270) {
+                // Right column - rotate 270° clockwise (90° counter-clockwise)
+                g2d.rotate(-Math.PI/2, centerX, centerY);
+                FontMetrics fm = g2d.getFontMetrics();
+                int textWidth = fm.stringWidth(name);
+                g2d.drawString(name, centerX - textWidth/2, centerY + 3);
+            }
+
+            // Restore transform
+            g2d.setTransform(originalTransform);
+        }
+
+        /**
+         * Draws owner name on a space
+         */
+        private void drawSpaceOwner(Graphics2D g2d, String ownerName, int x, int y, int width, int height,
+                                    Font font, int rotation) {
+            g2d.setColor(Color.RED);
+            g2d.setFont(font);
+
+            // Save original transform
+            AffineTransform originalTransform = g2d.getTransform();
+
+            // Calculate center of space
+            int centerX = x + width/2;
+            int centerY = y + height/2;
+
+            String text = "Owner: " + ownerName;
+
+            if (rotation == 0) {
+                // Bottom row
+                drawCenteredString(g2d, text, x, y + height - 5, width);
+            } else if (rotation == 90) {
+                // Left column
+                g2d.rotate(Math.PI/2, x + width - 8, centerY);
+                g2d.drawString(text, x + width - 8, centerY);
+            } else if (rotation == 180) {
+                // Top row
+                g2d.rotate(Math.PI, centerX, y + 10);
+                drawCenteredString(g2d, text, x, y + 10, width);
+            } else if (rotation == 270) {
+                // Right column
+                g2d.rotate(-Math.PI/2, x + 8, centerY);
+                g2d.drawString(text, x + 8, centerY);
+            }
+
+            // Restore transform
+            g2d.setTransform(originalTransform);
+        }
+
+        /**
+         * Draws houses or hotels on a property
+         */
+        private void drawSpaceHouses(Graphics2D g2d, Property property, int x, int y, int width, int height, int rotation) {
+            // Save original transform
+            AffineTransform originalTransform = g2d.getTransform();
+
+            // Rotate to match space orientation
+            int centerX = x + width/2;
+            int centerY = y + height/2;
+            g2d.rotate(Math.toRadians(rotation), centerX, centerY);
+
+            int houseCount = property.getHouses();
+            boolean hasHotel = property.hasHotel();
+
+            if (hasHotel) {
+                // Draw hotel
+                if (hotelImage != null) {
+                    g2d.drawImage(hotelImage, x + width/2 - 10, y + 20, null);
+                } else {
+                    // Fallback drawing
+                    g2d.setColor(Color.RED);
+                    g2d.fillRect(x + width/2 - 10, y + 20, 20, 20);
+                    g2d.setColor(Color.WHITE);
+                    g2d.drawString("H", x + width/2 - 5, y + 35);
+                }
+            } else if (houseCount > 0) {
+                // Draw houses
+                int houseSize = 15;
+                int startX = x + (width - (houseCount * houseSize)) / 2;
+
+                for (int i = 0; i < houseCount; i++) {
+                    if (houseImage != null) {
+                        g2d.drawImage(houseImage, startX + i * houseSize, y + 20, null);
+                    } else {
+                        // Fallback drawing
+                        g2d.setColor(Color.GREEN);
+                        g2d.fillRect(startX + i * houseSize, y + 20, houseSize-2, houseSize-2);
+                    }
+                }
+            }
+
+            // Restore transform
+            g2d.setTransform(originalTransform);
         }
 
 
@@ -2048,49 +1984,51 @@ public class GUI extends JFrame {
         }
 
         /**
-         * Author: Marena
          * Gets the x,y coordinates for drawing a token at a given board position
          */
         private Point getTokenPosition(int position, Player player) {
             int x, y;
 
-            // Determine the base position for the space
+            // Determine the base position based on the Gameboard space ordering
             if (position == 0) {
                 // GO (bottom right)
                 x = BOARD_SIZE - SPACE_SIZE / 2;
                 y = BOARD_SIZE - SPACE_SIZE / 2;
-            } else if (position < 10) {
-                // Bottom row (right side)
-                x = BOARD_SIZE - SPACE_SIZE - (position * SPACE_SIZE) + SPACE_SIZE / 2;
+            } else if (position >= 1 && position <= 9) {
+                // Bottom row (right to left from GO)
+                int spaceFromRight = position;
+                x = BOARD_SIZE - (spaceFromRight + 1) * SPACE_SIZE + SPACE_SIZE / 2;
                 y = BOARD_SIZE - SPACE_SIZE / 2;
             } else if (position == 10) {
                 // JAIL (bottom left)
                 x = SPACE_SIZE / 2;
                 y = BOARD_SIZE - SPACE_SIZE / 2;
-            } else if (position < 20) {
-                // Left column (going up)
+            } else if (position >= 11 && position <= 19) {
+                // Left column (bottom to top)
+                int spaceFromBottom = position - 10;
                 x = SPACE_SIZE / 2;
-                y = BOARD_SIZE - SPACE_SIZE - ((position - 10) * SPACE_SIZE) + SPACE_SIZE / 2;
+                y = BOARD_SIZE - (spaceFromBottom + 1) * SPACE_SIZE + SPACE_SIZE / 2;
             } else if (position == 20) {
                 // FREE PARKING (top left)
                 x = SPACE_SIZE / 2;
                 y = SPACE_SIZE / 2;
-            } else if (position < 30) {
-                // Top row (going right)
-                x = SPACE_SIZE + ((position - 20) * SPACE_SIZE) - SPACE_SIZE / 2;
+            } else if (position >= 21 && position <= 29) {
+                // Top row (left to right)
+                int spaceFromLeft = position - 20;
+                x = spaceFromLeft * SPACE_SIZE + SPACE_SIZE / 2;
                 y = SPACE_SIZE / 2;
             } else if (position == 30) {
                 // GO TO JAIL (top right)
                 x = BOARD_SIZE - SPACE_SIZE / 2;
                 y = SPACE_SIZE / 2;
             } else {
-                // Right column (going down)
+                // Right column (top to bottom)
+                int spaceFromTop = position - 30;
                 x = BOARD_SIZE - SPACE_SIZE / 2;
-                y = SPACE_SIZE + ((position - 30) * SPACE_SIZE) - SPACE_SIZE / 2;
+                y = spaceFromTop * SPACE_SIZE + SPACE_SIZE / 2;
             }
 
             // Add a small offset for each player to avoid tokens overlapping
-            // We'll get the player index and offset based on that
             int playerIndex = players.indexOf(player);
             x += (playerIndex - 1) * 7;
             y += (playerIndex - 1) * 7;
