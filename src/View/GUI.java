@@ -9,6 +9,7 @@ import Model.Board.Gameboard;
 import Model.Board.Player;
 import Model.Board.Tokens;
 import Model.GameState;
+import Model.Houses;
 import Model.Property.Property;
 import Model.Spaces.RailroadSpace;
 import Model.Spaces.Space;
@@ -57,6 +58,8 @@ public class GUI extends JFrame {
     private JButton payJailFeeButton;
     private JButton useJailCardButton;
     private JButton rollForJailButton;
+    private JButton sellHouseButton; // Button for selling houses
+
 
     // Current state tracking
     private final int[] lastDiceRoll = {0, 0};
@@ -367,6 +370,7 @@ public class GUI extends JFrame {
         buyPropertyButton = new JButton("Buy Property");
         auctionPropertyButton = new JButton("Auction Property");
         buildHouseButton = new JButton("Build House");
+        sellHouseButton = new JButton("Sell House"); // New button
         mortgageButton = new JButton("Mortgage Property");
         unmortgageButton = new JButton("Unmortgage Property");
         endTurnButton = new JButton("End Turn");
@@ -381,6 +385,7 @@ public class GUI extends JFrame {
         buyPropertyButton.addActionListener(e -> handleBuyProperty());
         auctionPropertyButton.addActionListener(e -> handleAuctionProperty());
         buildHouseButton.addActionListener(e -> handleBuildHouse());
+        sellHouseButton.addActionListener(e -> handleSellHouse()); // New listener
         mortgageButton.addActionListener(e -> handleMortgage());
         unmortgageButton.addActionListener(e -> handleUnmortgage());
         endTurnButton.addActionListener(e -> handleEndTurn());
@@ -573,6 +578,7 @@ public class GUI extends JFrame {
 
                 // Always show these buttons after roll
                 actionPanel.add(buildHouseButton);
+                actionPanel.add(sellHouseButton); // Add the Sell House button
                 actionPanel.add(mortgageButton);
                 actionPanel.add(unmortgageButton);
                 actionPanel.add(endTurnButton);
@@ -866,10 +872,8 @@ public class GUI extends JFrame {
     private void handleUnmortgage() {
         Player currentPlayer = gameState.getCurrentPlayer();
 
-        // Get list of mortgaged properties
-        List<Property> mortgagedProperties = currentPlayer.getProperties().stream()
-                .filter(Property::isMortgaged)
-                .collect(Collectors.toList());
+        // Get list of mortgaged properties that can be unmortgaged
+        List<Property> mortgagedProperties = currentPlayer.getMortgagedProperties();
 
         if (mortgagedProperties.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No mortgaged properties to unmortgage.",
@@ -890,13 +894,34 @@ public class GUI extends JFrame {
 
         if (selectedProperty != null) {
             try {
-                currentPlayer.unmortgageProperty(selectedProperty);
-                logMessage(currentPlayer.getName() + " unmortgaged " + selectedProperty.getName());
+                // Check if player has enough money for unmortgaging
+                int unmortgageCost = selectedProperty.getUnmortgageCost();
+                if (currentPlayer.getMoney() < unmortgageCost) {
+                    JOptionPane.showMessageDialog(this,
+                            "You don't have enough money to unmortgage this property. " +
+                                    "You need $" + unmortgageCost + ".",
+                            "Cannot Unmortgage",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                // Update UI
-                updatePlayerInfo();
-                updateActionButtons();
-                boardPanel.repaint();
+                // Unmortgage the property
+                boolean success = currentPlayer.unmortgageProperty(selectedProperty);
+
+                if (success) {
+                    logMessage(currentPlayer.getName() + " unmortgaged " + selectedProperty.getName() +
+                            " for $" + unmortgageCost);
+
+                    // Update UI
+                    updatePlayerInfo();
+                    updateActionButtons();
+                    boardPanel.repaint();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to unmortgage " + selectedProperty.getName() + ".",
+                            "Cannot Unmortgage",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(),
                         "Cannot Unmortgage", JOptionPane.ERROR_MESSAGE);
@@ -925,6 +950,78 @@ public class GUI extends JFrame {
         // Log turn change
         logMessage("Turn ended. Current player: " + gameState.getCurrentPlayer().getName());
         boardPanel.repaint();
+    }
+
+    private void handleSellHouse() {
+        Player currentPlayer = gameState.getCurrentPlayer();
+
+        // Get list of properties that have houses to sell
+        List<Property> propertiesWithHouses = currentPlayer.getProperties().stream()
+                .filter(p -> p.getHouses() > 0 || p.hasHotel())
+                .collect(Collectors.toList());
+
+        if (propertiesWithHouses.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No properties with houses or hotels to sell.",
+                    "Sell House", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Show property selection dialog
+        Property selectedProperty = (Property) JOptionPane.showInputDialog(
+                this,
+                "Select a property to sell houses from:",
+                "Sell House",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                propertiesWithHouses.toArray(),
+                propertiesWithHouses.get(0)
+        );
+
+        if (selectedProperty != null) {
+            try {
+                int maxHouses = selectedProperty.hasHotel() ? 5 : selectedProperty.getHouses();
+                String[] options = new String[maxHouses];
+                for (int i = 0; i < maxHouses; i++) {
+                    options[i] = String.valueOf(i + 1);
+                }
+
+                String selection = (String) JOptionPane.showInputDialog(
+                        this,
+                        "How many houses do you want to sell?",
+                        "Sell Houses",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]
+                );
+
+                if (selection != null) {
+                    int count = Integer.parseInt(selection);
+                    boolean success = bank.buyBackHouses(selectedProperty, currentPlayer, count);
+
+                    if (success) {
+                        int housePrice = Houses.getHousePrice(selectedProperty.getColorGroup());
+                        int refund = (housePrice * count) / 2;
+                        logMessage(currentPlayer.getName() + " sold " + count +
+                                " house(s) from " + selectedProperty.getName() +
+                                " for $" + refund);
+
+                        // Update UI
+                        updatePlayerInfo();
+                        updateActionButtons();
+                        boardPanel.repaint();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Failed to sell houses from " + selectedProperty.getName() + ".",
+                                "Cannot Sell Houses",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(),
+                        "Cannot Sell Houses", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
